@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TENIS MAFIA</title>
+    <meta name="description" content="Encuentra los últimos lanzamientos de tennis, tanto originales como las mejores réplicas del mercado.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <!-- PayPal SDK - Reemplaza YOUR_CLIENT_ID con tu Client ID real -->
+    <script src="https://www.paypal.com/sdk/js?client-id=YOUR_CLIENT_ID&currency=MXN" defer></script>
+
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo-container">
+            <div class="logo">
+                <div class="logo-inner">
+                                <a href="/" class="logo">
+                <img src="./images/tennismay.png" alt="Logo Tenis Mafia" class="logo-img">
+            </a>
+                </div>
+            </div>
+        </div>
+
+            <nav class="main-nav">
+                <ul class="nav-links">
+                    <li><a href="#originales">Originales</a></li>
+                    <li><a href="#falsificaciones">Top Quality</a></li>
+                    <li><a href="#contacto">Contacto</a></li>
+                    <li><a href="#reseñas">Reseñas</a></li>
+                </ul>
+            </nav>
+            <div class="header-actions">
+                <button class="cart-toggle" aria-label="Abrir carrito de compras">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 3H5L5.4 5M7 13H17L21 5H5.4M7 13L5.4 5M7 13L4.7 15.3C4.3 15.7 4.6 16 5 16H17M17 13V16M9 19.5A1.5 1.5 0 1 1 12 19.5A1.5 1.5 0 0 1 9 19.5ZM20 19.5A1.5 1.5 0 1 1 23 19.5A1.5 1.5 0 0 1 20 19.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span class="cart-count" id="CartCount">0</span>
+                </button>
+                
+                <div class="user-container">
+                    <div class="user-avatar" id="userIcon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-menu" id="userMenu">
+                        <a href="#" id="logoutBtn">Cerrar Sesión</a>
+                    </div>
+                </div>
+                
+                <button class="mobile-nav-toggle" aria-label="Abrir menú de navegación">
+                    <span class="hamburger-icon"></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+
+        <!-- Sección de inicio o hero -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">Domina la Calle</h1>
+            <p class="hero-subtitle">La nueva era del estilo urbano ha llegado. Descubre colecciones exclusivas.</p>
+            <a href="#originales" class="cta-button">Ver Colección</a>
+        </div>
+        <div class="hero-background"></div>
+    </section>
+
+        <!-- Sección de Originales -->
+    <section id="originales" class="product-section alt-bg">
+        <h2 class="section-title">ORIGINALES</h2>
+        <p class="section-subtitle">Descubre nuestra colección exclusiva de tenis de edición limitada con la máxima calidad en replicas</p>
+        
+        <div class="product-grid" id="products-container-originales">
+            <div class="product-card" data-item-id="prod-001">
+                <div class="hot-item-badge">¡MÁS VENDIDO!</div>
+                <div class="product-image-container" data-zoom-src="URL_IMAGEN_ALTA_RESOLUCION">
+                    <img class="product-image" src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
+                    alt="Tennis Yeezy Boost 350 Replica" class="product-image">
+                </div>
+                <div class="product-info">
+                    <h3 class="product-name">Yeezy Boost 350 V2 "Zebra"</h3>
+                    <p class="product-description">Réplica premium con tecnología Boost, suela de goma y detalles en contraste. La comodidad definitiva.</p>
+                    
+                    <div class="product-features">
+                        <div class="feature"><i class="fas fa-check-circle"></i> Material premium</div>
+                        <div class="feature"><i class="fas fa-shoe-prints"></i> Plantilla Boost</div>
+                    </div>
+                    
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                        <span>(128 reseñas)</span>
+                    </div>
+                    
+                    <div class="product-price-container">
+                        <span class="original-price">$2,500.00 MXN</span>
+                        <span class="product-price">$1,800.00 MXN</span>
+                        <span class="discount-badge">28% OFF</span>
+                    </div>
+                    
+                    <button class="add-to-cart-btn" 
+                    data-id="prod-001" 
+                    data-name="Yeezy Boost 350 V2 &quot;Zebra&quot;" 
+                    data-price="1800.00" 
+                    data-image="/images/airforce-sf-1.png">
+                    <i class="fas fa-shopping-cart"></i> Agregar al Carrito
+                </button>
+                
+                <a href="#" class="view-details">Ver detalles del producto <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+        
+
+    </div>
+    </section>
+
+        <!-- Sección de Falsificaciones -->
+    <section id="falsificaciones" class="product-section alt-bg">
+        <h2 class="section-title">Top Quality </h2>
+        <p class="section-subtitle">Descubre nuestra colección exclusiva de tenis de edición limitada con la máxima calidad en replicas</p>
+        
+        <div class="product-grid" id="products-container-fake">
+            <div class="product-card-fake" data-item-id="prod-001">
+                    <div class="hot-item-badge">¡MÁS VENDIDO!</div>
+                    <div class="product-image-container">
+                        <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
+                            alt="Tennis Yeezy Boost 350 Replica" class="product-image">
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">Yeezy Boost 350 V2 "Zebra"</h3>
+                        <p class="product-description">Réplica premium con tecnología Boost, suela de goma y detalles en contraste. La comodidad definitiva.</p>
+                        
+                        <div class="product-features">
+                            <div class="feature"><i class="fas fa-check-circle"></i> Material premium</div>
+                            <div class="feature"><i class="fas fa-shoe-prints"></i> Plantilla Boost</div>
+                        </div>
+                        
+                        <div class="rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                            <span>(128 reseñas)</span>
+                        </div>
+                        
+                        <div class="product-price-container">
+                            <span class="original-price">$2,500.00 MXN</span>
+                            <span class="product-price">$1,800.00 MXN</span>
+                            <span class="discount-badge">28% OFF</span>
+                        </div>
+                        
+                        <button class="add-to-cart-btn" 
+                                data-id="prod-001" 
+                                data-name="Yeezy Boost 350 V2 &quot;Zebra&quot;" 
+                                data-price="1800.00" 
+                                data-image="/images/airforce-sf-1.png">
+                            <i class="fas fa-shopping-cart"></i> Agregar al Carrito
+                        </button>
+                        
+                        <a href="#" class="view-details">Ver detalles del producto <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+            </div>
+    </section>
+
+        <!-- Sección de Reseñas -->
+    <section id="reseñas" class="reviews-section">
+        <div class="container">
+            <h2 class="section-title">Lo que Dicen Nuestros Clientes</h2>
+            <p class="section-subtitle">Experiencias reales de amantes del estilo urbano que confiaron en Tenis Mafia</p>
+            
+            <div class="reviews-container">
+                <!-- Reseña 1 -->
+                <div class="review-card">
+                    <div class="review-header">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1887&q=80" alt="Cliente" class="review-avatar">
+                        <div class="reviewer-info">
+                            <div class="reviewer-name">María González</div>
+                            <div class="reviewer-location">Guadalajara, Jalisco</div>
+                        </div>
+                    </div>
+                    
+                    <div class="review-rating">
+                        <i class="fas fa-star rating-star"></i>
+                        <i class="fas fa-star rating-star"></i>
+                        <i class="fas fa-star rating-star"></i>
+                        <i class="fas fa-star rating-star"></i>
+                        <i class="fas fa-star rating-star"></i>
+                        <div class="review-date">Hace 2 semanas</div>
+                    </div>
+                    
+                    <p class="review-content">Compré los Yeezy Boost 350 y la calidad es increíble. No se diferencian en nada de los originales. Llegaron antes de lo esperado y el empaque era impecable. Definitivamente volveré a comprar aquí.</p>
+                    
+                    <div class="verified-badge">
+                        <i class="fas fa-check-circle"></i> Compra verificada
+                    </div>
+                    
+                    <div class="review-product">
+                        <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Producto" class="product-thumbnail">
+                        <div>
+                            <div class="product-name">Yeezy Boost 350 V2 "Zebra"</div>
+                            <div class="product-category">Falsificación Premium</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Reseña 2 -->
+                <div class="review-card">
+                    <div class="review-header">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1887&q=80" alt="Cliente" class="review-avatar">
+                        <div class="reviewer-info">
+                            <div class="reviewer-name">Carlos Mendoza</div>
+                            <div class="reviewer-location">Monterrey, Nuevo León</div>
+                        </div>
+                    </div>
+                    
+                    <div class="review-rating">
+                        <i class="fas fa-star rating-star"></i>
+                        <i class="fas fa-star rating-star"></i>
+                        <i class="fas fa-star rating-star"></i>
+                        <i class="fas fa-star rating-star"></i>
+                        <i class="fas fa-star rating-star"></i>
+                        <div class="review-date">Hace 1 mes</div>
+                    </div>
+                    
+                    <p class="review-content">Las Air Jordan 1 Retro que compré son simplemente perfectas. El cuero es de alta calidad y la comodidad es excelente. Mis amigos no pueden creer que sean réplicas. ¡El mejor servicio al cliente que he experimentado!</p>
+                    
+                    <div class="verified-badge">
+                        <i class="fas fa-check-circle"></i> Compra verificada
+                    </div>
+                    
+                    <div class="review-product">
+                        <img src="https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1364&q=80" alt="Producto" class="product-thumbnail">
+                        <div>
+                            <div class="product-name">Air Jordan 1 Retro High</div>
+                            <div class="product-category">Falsificación Premium</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Reseña 3 -->
+                <div class="review-card">
+                    <div class="review-header">
+                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Cliente" class="review-avatar">
+                        <div class="reviewer-info">
+                            <div class="reviewer-name">Ana Torres</div>
+                            <div class="reviewer-location">CDMX, México</div>
+                        </div>
+                    </div>
+                    
+                    <div class="review-rating">
+                        <i class="fas fa-star rating-star"></i>
+                        <i class="fas fa-star rating-star"></i>
+                        <i class="fas fa-star rating-star"></i>
+                        <i class="fas fa-star rating-star"></i>
+                        <i class="fas fa-star-half-alt rating-star"></i>
+                        <div class="review-date">Hace 3 días</div>
+                    </div>
+                    
+                    <p class="review-content">Los Nike Dunk Low Retro superaron mis expectativas. El envío fue rápido y los detalles de fabricación son impecables. Solo le pongo 4.5 estrellas porque pedí medio número más grande de lo que uso normalmente, pero eso fue error mío. ¡Recomendado 100%!</p>
+                    
+                    <div class="verified-badge">
+                        <i class="fas fa-check-circle"></i> Compra verificada
+                    </div>
+                    
+                    <div class="review-product">
+                        <img src="https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1450&q=80" alt="Producto" class="product-thumbnail">
+                        <div>
+                            <div class="product-name">Nike Dunk Low Retro</div>
+                            <div class="product-category">Falsificación Premium</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Reseñas adicionales (ocultas inicialmente) -->
+                <div class="review-card hidden-reviews">
+                    <div class="review-header">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1964&q=80" alt="Cliente" class="review-avatar">
+                        <div class="reviewer-info">
+                            <div class="reviewer-name">Luis Ramírez</div>
+                            <div class="reviewer-location">Puebla, Puebla</div>
+                        </div>
+                    </div>
+                    
+                    <div class="review-rating">
+                        <i class="fas fa-star rating-star"></i>
+                        <i class="fas fa-star rating-star"></i>
+                        <i class="fas fa-star rating-star"></i>
+                        <i class="fas fa-star rating-star"></i>
+                        <i class="fas fa-star rating-star"></i>
+                        <div class="review-date">Hace 2 meses</div>
+                    </div>
+                    
+                    <p class="review-content">He comprado en varios sitios de réplicas, pero Tenis Mafia es el mejor sin duda. Los materiales son de primera y la atención al detalle es impresionante. Mis Yeezys han pasado por varios lavados y siguen como nuevos.</p>
+                    
+                    <div class="verified-badge">
+                        <i class="fas fa-check-circle"></i> Compra verificada
+                    </div>
+                    
+                    <div class="review-product">
+                        <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Producto" class="product-thumbnail">
+                        <div>
+                            <div class="product-name">Yeezy Boost 350 V2 "Zebra"</div>
+                            <div class="product-category">Falsificación Premium</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="review-card hidden-reviews">
+                    <div class="review-header">
+                        <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1887&q=80" alt="Cliente" class="review-avatar">
+                        <div class="reviewer-info">
+                            <div class="reviewer-name">Sofía Jiménez</div>
+                            <div class="reviewer-location">Cancún, Quintana Roo</div>
+                        </div>
+                    </div>
+                    
+                    <div class="review-rating">
+                        <i class="fas fa-star rating-star"></i>
+                        <i class="fas fa-star rating-star"></i>
+                        <i class="fas fa-star rating-star"></i>
+                        <i class="fas fa-star rating-star"></i>
+                        <i class="far fa-star rating-star"></i>
+                        <div class="review-date">Hace 3 semanas</div>
+                    </div>
+                    
+                    <p class="review-content">Las Nike Dunk son cómodas y el diseño es perfecto. Solo le pongo 4 estrellas porque tardaron un poco más de lo esperado en llegar, pero el producto es excelente. Definitivamente vale la pena la espera por la calidad que ofrecen.</p>
+                    
+                    <div class="verified-badge">
+                        <i class="fas fa-check-circle"></i> Compra verificada
+                    </div>
+                    
+                    <div class="review-product">
+                        <img src="https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1450&q=80" alt="Producto" class="product-thumbnail">
+                        <div>
+                            <div class="product-name">Nike Dunk Low Retro</div>
+                            <div class="product-category">Falsificación Premium</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="review-card hidden-reviews">
+                    <div class="review-header">
+                        <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1887&q=80" alt="Cliente" class="review-avatar">
+                        <div class="reviewer-info">
+                            <div class="reviewer-name">Diego Fernández</div>
+                            <div class="reviewer-location">Guadalajara, Jalisco</div>
+                        </div>
+                    </div>
+                    
+                    <div class="review-rating">
+                        <i class="fas fa-star rating-star"></i>
+                        <i class="fas fa-star rating-star"></i>
+                        <i class="fas fa-star rating-star"></i>
+                        <i class="fas fa-star rating-star"></i>
+                        <i class="fas fa-star rating-star"></i>
+                        <div class="review-date">Hace 1 semana</div>
+                    </div>
+                    
+                    <p class="review-content">¡Increíble! Las Air Jordan son tan buenas que incluso mis amigos que tienen pares originales no notaron la diferencia. La comodidad es excepcional y la calidad de construcción es notable. Ya estoy planeando mi próxima compra.</p>
+                    
+                    <div class="verified-badge">
+                        <i class="fas fa-check-circle"></i> Compra verificada
+                    </div>
+                    
+                    <div class="review-product">
+                        <img src="https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1364&q=80" alt="Producto" class="product-thumbnail">
+                        <div>
+                            <div class="product-name">Air Jordan 1 Retro High</div>
+                            <div class="product-category">Falsificación Premium</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="load-more-container">
+                <button class="load-more-btn" id="loadMoreBtn">Ver más reseñas</button>
+            </div>
+        </div>
+    </section>
+
+        <!-- Sección de Contacto -->
+    <section id="contacto" class="contact-section">
+            <div class="contact-container">
+                <h2 class="section-title">¿Tienes Preguntas?</h2>
+                <p>Envíanos un mensaje y nuestro equipo se pondrá en contacto contigo.</p>
+                <form id="contact-form" class="contact-form" novalidate>
+                    <div class="form-group">
+                        <input type="text" id="nombre" name="nombre" required>
+                        <label for="nombre">Nombre Completo</label>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" id="email" name="email" required>
+                        <label for="email">Correo Electrónico</label>
+                    </div>
+                    <div class="form-group">
+                        <textarea id="mensaje" name="mensaje" rows="4" required></textarea>
+                        <label for="mensaje">Tu Mensaje</label>
+                    </div>
+                    <button type="submit" class="cta-button form-submit-btn">Enviar Mensaje</button>
+                </form>
+                <div id="form-response" class="form-response"></div>
+            </div>
+    </section>
+
+    <!-- Seccion de carrito  -->
+<div id="cartOverlay" class="cart-overlay">
+    <div class="cart-sidebar">
+        <div class="cart-header">
+            <h2>Carrito de Compras</h2>
+            <button class="cart-close" id="cartClose">
+                ✕
+            </button>
+        </div>
+        <div class="cart-content">
+            <div class="cart-items" id="cartItems">
+                <!-- Los productos se agregarán dinámicamente aquí -->
+            </div>
+            <div class="cart-empty" id="cartEmpty">
+                <p>Tu carrito está vacío</p>
+                <p>¡Agrega algunos productos increíbles!</p>
+            </div>
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span class="total-label">Total:</span>
+                <span class="total-amount" id="cartTotal">$0.00 MXN</span>
+            </div>
+            <div class="cart-actions">
+                <button class="clear-cart-btn" id="clearCart">Vaciar Carrito</button>
+                <div class="paypal-checkout-container" id="paypalContainer">
+                    <!-- Botón de PayPal se renderizará aquí -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Alerta acceso denegado -->
+    <div id="premiumAlert" class="premium-alert">
+        <div class="alert-content">
+            <div class="alert-header">
+                <div class="alert-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h2 class="alert-title">Acceso Requerido</h2>
+            </div>
+            <div class="alert-body">
+                <p class="alert-message">Por favor inicia sesión para acceder a tu carrito de compras.</p>
+                <div class="alert-actions">
+                    <button id="loginBtn" class="alert-btn btn-primary">Iniciar Sesión</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+            <!-- Authentication Modal -->
+    <div class="auth-modal" id="authModal">
+        <div class="auth-container">
+            <div class="auth-header">
+                <h2>Iniciar Sesión</h2>
+                <div class="auth-tabs">
+                    <div class="auth-tab active" data-tab="login">Iniciar</div>
+                    <div class="auth-tab" data-tab="register">Registrar</div>
+                </div>
+            </div>
+            <div class="auth-content">
+                <!-- Login Form -->
+                <form class="auth-form active" id="loginForm">
+                    <div class="form-group-auth">
+                        <label for="login-email">Correo Electrónico</label>
+                        <input type="email" id="login-email" required>
+                    </div>
+                    <div class="form-group-auth">
+                        <label for="login-password">Contraseña</label>
+                        <input type="password" id="login-password" required>
+                    </div>
+                    <div class="remember-forgot">
+                        <div class="remember-me">
+                            <input type="checkbox" id="remember">
+                            <label for="remember">Recordarme</label>
+                        </div>
+                        <a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a>
+                    </div>
+                    <button type="submit" class="auth-btn">Iniciar Sesión</button>
+                    <div class="auth-footer">
+                        <p>¿No tienes cuenta? <a href="#" class="switch-tab" data-tab="register">Regístrate aquí</a></p>
+                    </div>
+                </form>
+                
+                <!-- Register Form -->
+                <form class="auth-form" id="registerForm">
+                    <div class="form-group-auth">
+                        <label for="register-name">Nombre Completo</label>
+                        <input type="text" id="register-name" required>
+                    </div>
+                    <div class="form-group-auth">
+                        <label for="register-email">Correo Electrónico</label>
+                        <input type="email" id="register-email" required>
+                    </div>
+                    <div class="form-group-auth">
+                        <label for="register-password">Contraseña</label>
+                        <input type="password" id="register-password" required>
+                    </div>
+                    <div class="form-group-auth">
+                        <label for="register-confirm">Confirmar Contraseña</label>
+                        <input type="password" id="register-confirm" required>
+                    </div>
+                    <button type="submit" class="auth-btn">Registrarse</button>
+                    
+                </form>
+            </div>
+        </div>
+    </div>
+
+        <!-- Modal de Recuperación de Contraseña -->
+    <div class="auth-modal" id="passwordRecoveryModal">
+        <div class="auth-container">
+            <div class="auth-header">
+                <h2>Recuperar Contraseña</h2>
+            </div>
+            <div class="auth-content">
+                <form class="auth-form active" id="recoveryForm">
+                    <div class="form-group-auth">
+                        <label for="recovery-email">Correo Electrónico</label>
+                        <input type="email" id="recovery-email" required>
+                        <p class="info-text">Ingresa tu dirección de correo electrónico y te enviaremos un enlace para restablecer tu contraseña.</p>
+                    </div>
+                    <button type="submit" class="auth-btn">Enviar Instrucciones</button>
+                    <div class="auth-footer">
+                        <p>¿Recordaste tu contraseña? <a href="#" class="switch-tab" data-tab="login">Inicia Sesión</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notificación -->
+    <div class="notification" id="notification">
+        <div class="notification-icon">✓</div>
+        <div class="notification-content">
+            <h4 id="notification-title">Éxito</h4>
+            <p id="notification-message">Operación completada correctamente.</p>
+        </div>
+    </div>
+
+    </main>
+
+    <footer class="main-footer">
+        <div class="footer-container">
+            <p>&copy; 2025 Kicks Hub. Todos los derechos reservados.</p>
+            <p>Diseñado con pasión por un desarrollador de primer nivel.</p>
+        </div>
+    </footer>
+
+    <script src="/js/script.js"></script>
+    <!-- <script src="/js/auth.js"></script> -->
+       <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+</body>
+</html>
