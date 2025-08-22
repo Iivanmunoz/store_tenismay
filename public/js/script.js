@@ -85,7 +85,7 @@ const CartManager = {
         this.updateDisplay();
     },
 
-    // Cachear elementos del DOM
+    // Cachear elementos del DOM - CORREGIDO
     cacheElements() {
         DOM_CACHE.cartOverlay = document.getElementById('cartOverlay');
         DOM_CACHE.cartClose = document.getElementById('cartClose');
@@ -96,9 +96,58 @@ const CartManager = {
         DOM_CACHE.clearCartBtn = document.getElementById('clearCart');
         DOM_CACHE.cartToggle = document.querySelector('.cart-toggle');
         DOM_CACHE.paypalContainer = document.getElementById('paypalContainer');
+        DOM_CACHE.cartActions = document.querySelector('.cart-actions');
     },
 
-    // Vincular eventos
+    // Actualizar contenido del carrito - CORREGIDO
+    updateCartContent() {
+        if (!DOM_CACHE.cartItems || !DOM_CACHE.cartEmpty) return;
+
+        if (cart.length === 0) {
+            DOM_CACHE.cartItems.innerHTML = '';
+            DOM_CACHE.cartEmpty.style.display = 'block';
+            this.toggleCartActions(false);
+            // LIMPIAR PAYPAL CONTAINER CUANDO NO HAY ITEMS
+            if (DOM_CACHE.paypalContainer) {
+                DOM_CACHE.paypalContainer.innerHTML = '';
+            }
+            return;
+        }
+
+        DOM_CACHE.cartEmpty.style.display = 'none';
+        this.toggleCartActions(true);
+        this.renderCartItems();
+        // RENDERIZAR PAYPAL DESPUÉS DE ACTUALIZAR ITEMS
+        setTimeout(() => {
+            PayPalManager.renderCartButton();
+        }, 100);
+    },
+
+    // Alternar acciones del carrito - CORREGIDO
+    toggleCartActions(show) {
+        if (DOM_CACHE.cartActions) {
+            DOM_CACHE.cartActions.style.display = show ? 'flex' : 'none';
+        }
+        // TAMBIÉN CONTROLAR EL CONTENEDOR DE PAYPAL INDIVIDUALMENTE
+        if (DOM_CACHE.paypalContainer) {
+            DOM_CACHE.paypalContainer.style.display = show ? 'block' : 'none';
+        }
+    },
+
+    // Actualizar display del carrito - CORREGIDO
+    updateDisplay() {
+        this.updateCounter();
+        this.updateCartContent();
+        this.updateTotal();
+        // ASEGURAR QUE PAYPAL SE RENDERICE DESPUÉS DE ACTUALIZAR
+        if (cart.length > 0) {
+            setTimeout(() => {
+                PayPalManager.renderCartButton();
+            }, 200);
+        }
+    },
+
+    // Mantener el resto de métodos igual...
     bindEvents() {
         // Abrir carrito
         if (DOM_CACHE.cartToggle) {
@@ -138,7 +187,22 @@ const CartManager = {
         window.addEventListener('beforeunload', () => this.saveToStorage());
     },
 
-    // Manejar toggle del carrito
+    // Abrir carrito - AÑADIDO RENDERIZADO DE PAYPAL
+    openCart() {
+        if (DOM_CACHE.cartOverlay) {
+            DOM_CACHE.cartOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            this.updateDisplay();
+            // RENDERIZAR PAYPAL AL ABRIR EL CARRITO
+            if (cart.length > 0) {
+                setTimeout(() => {
+                    PayPalManager.renderCartButton();
+                }, 300);
+            }
+        }
+    },
+
+    // Resto de métodos sin cambios...
     handleCartToggle() {
         if (!currentUser) {
             NotificationManager.showPremiumAlert();
@@ -147,16 +211,6 @@ const CartManager = {
         this.openCart();
     },
 
-    // Abrir carrito
-    openCart() {
-        if (DOM_CACHE.cartOverlay) {
-            DOM_CACHE.cartOverlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-            this.updateDisplay();
-        }
-    },
-
-    // Cerrar carrito
     closeCart() {
         if (DOM_CACHE.cartOverlay) {
             DOM_CACHE.cartOverlay.classList.remove('active');
@@ -164,7 +218,6 @@ const CartManager = {
         }
     },
 
-    // Agregar producto al carrito
     addProduct(productData) {
         if (!currentUser) {
             NotificationManager.showPremiumAlert();
@@ -199,7 +252,6 @@ const CartManager = {
         return true;
     },
 
-    // Actualizar cantidad
     updateQuantity(itemId, change) {
         const itemIndex = cart.findIndex(item => item.id === itemId);
         if (itemIndex > -1) {
@@ -214,7 +266,6 @@ const CartManager = {
         }
     },
 
-    // Eliminar producto
     removeProduct(itemId) {
         const itemIndex = cart.findIndex(item => item.id === itemId);
         if (itemIndex > -1) {
@@ -224,7 +275,6 @@ const CartManager = {
         }
     },
 
-    // Vaciar carrito
     clearCart() {
         if (cart.length === 0) return;
         
@@ -236,14 +286,6 @@ const CartManager = {
         }
     },
 
-    // Actualizar display del carrito
-    updateDisplay() {
-        this.updateCounter();
-        this.updateCartContent();
-        this.updateTotal();
-    },
-
-    // Actualizar contador
     updateCounter() {
         const totalCount = cart.reduce((total, item) => total + item.quantity, 0);
         if (DOM_CACHE.cartCount) {
@@ -252,31 +294,6 @@ const CartManager = {
         }
     },
 
-    // Actualizar contenido del carrito
-    updateCartContent() {
-        if (!DOM_CACHE.cartItems || !DOM_CACHE.cartEmpty) return;
-
-        if (cart.length === 0) {
-            DOM_CACHE.cartItems.innerHTML = '';
-            DOM_CACHE.cartEmpty.style.display = 'block';
-            this.toggleCartActions(false);
-            return;
-        }
-
-        DOM_CACHE.cartEmpty.style.display = 'none';
-        this.toggleCartActions(true);
-        this.renderCartItems();
-    },
-
-    // Alternar acciones del carrito
-    toggleCartActions(show) {
-        const cartActions = document.getElementById('cartActions');
-        if (cartActions) {
-            cartActions.style.display = show ? 'flex' : 'none';
-        }
-    },
-
-    // Renderizar items del carrito
     renderCartItems() {
         const fragment = document.createDocumentFragment();
 
@@ -289,7 +306,6 @@ const CartManager = {
         DOM_CACHE.cartItems.appendChild(fragment);
     },
 
-    // Crear elemento de item del carrito
     createCartItemElement(item) {
         const itemDiv = document.createElement('div');
         itemDiv.className = 'cart-item';
@@ -312,12 +328,10 @@ const CartManager = {
             </div>
         `;
 
-        // Bind eventos a los botones
         this.bindCartItemEvents(itemDiv);
         return itemDiv;
     },
 
-    // Vincular eventos a items del carrito
     bindCartItemEvents(itemElement) {
         const decreaseBtn = itemElement.querySelector('.decrease-btn');
         const increaseBtn = itemElement.querySelector('.increase-btn');
@@ -342,7 +356,6 @@ const CartManager = {
         }
     },
 
-    // Actualizar total
     updateTotal() {
         const totalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
         if (DOM_CACHE.cartTotal) {
@@ -350,7 +363,6 @@ const CartManager = {
         }
     },
 
-    // Guardar en localStorage
     saveToStorage() {
         try {
             localStorage.setItem(CONFIG.CART_STORAGE_KEY, JSON.stringify(cart));
@@ -359,7 +371,6 @@ const CartManager = {
         }
     },
 
-    // Cargar desde localStorage
     loadFromStorage() {
         try {
             const savedCart = localStorage.getItem(CONFIG.CART_STORAGE_KEY);
@@ -372,12 +383,10 @@ const CartManager = {
         }
     },
 
-    // Obtener carrito actual
     getCart() {
         return [...cart];
     },
 
-    // Establecer carrito
     setCart(newCart) {
         cart = Array.isArray(newCart) ? newCart : [];
         this.updateDisplay();
@@ -854,7 +863,112 @@ const AuthManager = {
     }
 };
 
+// ========== GESTIÓN DE ZOOM EN IMÁGENES ==========
+const ZoomManager = {
+    // Inicializar zoom para todos los productos
+    initZoomForProducts() {
+        const imageContainers = document.querySelectorAll('.product-image-container');
+        
+        imageContainers.forEach(container => {
+            const image = container.querySelector('.product-image');
+            const lens = container.querySelector('.zoom-lens');
+            if (image && lens) {
+                this.initZoomForProduct(container, image, lens);
+            }
+        });
+    },
+
+    // Inicializar zoom para un producto específico
+    initZoomForProduct(container, image, lens) {
+        if (!container || !image || !lens) return;
+
+        let isZooming = false;
+
+        // Mostrar/ocultar lens al entrar/salir del contenedor
+        container.addEventListener('mouseenter', () => {
+            lens.style.display = 'block';
+            container.querySelector('.zoom-indicator')?.classList.add('active');
+        });
+
+        container.addEventListener('mouseleave', () => {
+            lens.style.display = 'none';
+            container.querySelector('.zoom-indicator')?.classList.remove('active');
+            isZooming = false;
+        });
+
+        // Mover el lens con el mouse
+        container.addEventListener('mousemove', (e) => {
+            if (!isZooming) {
+                isZooming = true;
+            }
+
+            const rect = container.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            // Calcular posición del lens (centrado en el cursor)
+            const lensSize = 100; // Tamaño del lens
+            let lensX = x - lensSize / 2;
+            let lensY = y - lensSize / 2;
+
+            // Limitar el lens dentro del contenedor
+            lensX = Math.max(0, Math.min(lensX, container.offsetWidth - lensSize));
+            lensY = Math.max(0, Math.min(lensY, container.offsetHeight - lensSize));
+
+            // Posicionar el lens
+            lens.style.left = lensX + 'px';
+            lens.style.top = lensY + 'px';
+
+            // Calcular la posición de la imagen de fondo para simular zoom
+            const bgX = -(lensX * 2);
+            const bgY = -(lensY * 2);
+            
+            lens.style.backgroundImage = `url(${image.src})`;
+            lens.style.backgroundPosition = `${bgX}px ${bgY}px`;
+            lens.style.backgroundSize = `${container.offsetWidth * 2}px ${container.offsetHeight * 2}px`;
+        });
+
+        // Touch events para móviles
+        container.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            lens.style.display = 'block';
+            container.querySelector('.zoom-indicator')?.classList.add('active');
+        });
+
+        container.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = container.getBoundingClientRect();
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
+
+            const lensSize = 100;
+            let lensX = x - lensSize / 2;
+            let lensY = y - lensSize / 2;
+
+            lensX = Math.max(0, Math.min(lensX, container.offsetWidth - lensSize));
+            lensY = Math.max(0, Math.min(lensY, container.offsetHeight - lensSize));
+
+            lens.style.left = lensX + 'px';
+            lens.style.top = lensY + 'px';
+
+            const bgX = -(lensX * 2);
+            const bgY = -(lensY * 2);
+            
+            lens.style.backgroundImage = `url(${image.src})`;
+            lens.style.backgroundPosition = `${bgX}px ${bgY}px`;
+            lens.style.backgroundSize = `${container.offsetWidth * 2}px ${container.offsetHeight * 2}px`;
+        });
+
+        container.addEventListener('touchend', () => {
+            lens.style.display = 'none';
+            container.querySelector('.zoom-indicator')?.classList.remove('active');
+        });
+    }
+};
+
 // ========== GESTIÓN DE PRODUCTOS ==========
+// ProductManager para trabajar con estructura de BD
 const ProductManager = {
     init() {
         this.loadProducts();
@@ -863,80 +977,68 @@ const ProductManager = {
     async loadProducts() {
         try {
             await Promise.all([
-                this.loadProductsOriginal(),
-                this.loadProductsFake()
+                this.loadProductsWithTallas('originales'),
+                this.loadProductsWithTallas('falsificaciones')
             ]);
+            // Inicializar zoom después de cargar productos
+            setTimeout(() => {
+                ZoomManager.initZoomForProducts();
+            }, 100);
         } catch (error) {
             console.error('Error al cargar productos:', error);
             NotificationManager.showError('Error al cargar productos');
         }
     },
 
-    async loadProductsOriginal() {
+    async loadProductsWithTallas(tipo) {
         try {
-            const response = await fetch('/api/productos/originales');
+            const response = await fetch(`/api/productos/${tipo}`);
             const data = await response.json();
             
             if (data.success) {
-                this.renderProducts(data.data, 'products-container-originales');
+                const containerId = tipo === 'originales' ? 'products-container-originales' : 'products-container-fake';
+                this.renderProductsWithStock(data.data, containerId);
             } else {
                 throw new Error(data.message);
             }
         } catch (error) {
-            console.error('Error al cargar productos originales:', error);
+            console.error(`Error al cargar productos ${tipo}:`, error);
         }
     },
 
-    async loadProductsFake() {
-        try {
-            const response = await fetch('/api/productos/falsificaciones');
-            const data = await response.json();
-            
-            if (data.success) {
-                this.renderProducts(data.data, 'products-container-fake');
-            } else {
-                throw new Error(data.message);
-            }
-        } catch (error) {
-            console.error('Error al cargar productos fake:', error);
-        }
-    },
-
-    renderProducts(products, containerId) {
+    renderProductsWithStock(products, containerId) {
         const container = document.getElementById(containerId);
         if (!container) return;
 
         const fragment = document.createDocumentFragment();
 
         products.forEach(product => {
-            const productElement = this.createProductElement(product);
+            const productElement = this.createProductElementWithStock(product);
             fragment.appendChild(productElement);
         });
 
         container.innerHTML = '';
         container.appendChild(fragment);
-        
-        // Inicializar el zoom para los productos recién renderizados
         this.initZoomForProducts();
     },
 
-    createProductElement(product) {
+    createProductElementWithStock(product) {
         const productDiv = document.createElement('div');
         productDiv.className = 'product-card-fake';
         
-        const tallasHTML = Array.isArray(product.tallas_disponibles)
-            ? product.tallas_disponibles.map(t => 
-                `<button class="talla-btn" data-talla="${t}">${t}</button>`
-            ).join('')
-            : '';
-
+        // Crear HTML de tallas con stock
+        const tallasHTML = this.createTallasWithStock(product.tallas_info || []);
         const productImage = Utils.getProductImage(product.nombre);
+        
+        // Determinar si el producto tiene stock
+        const hasStock = product.tallas_info && product.tallas_info.some(t => t.stock > 0);
             
         productDiv.innerHTML = `
             <div class="product-image-container">
+                ${!hasStock ? '<div class="out-of-stock-overlay">SIN STOCK</div>' : ''}
                 <img src="${product.imagen_url || productImage}" 
                     alt="${product.nombre}"
-                    class="product-image"
+                    class="product-image ${!hasStock ? 'out-of-stock' : ''}"
                     onerror="Utils.handleImageError(this)">
                 <div class="zoom-lens"></div>
                 <div class="zoom-indicator">Mueve el cursor para explorar</div>
@@ -948,7 +1050,7 @@ const ProductManager = {
                 <div class="product-price-section">
                     <div class="current-price-container">
                         <span class="product-price">${Utils.formatPrice(product.precio)}</span>
-                        <span class="original-price">$1,250.00 MXN</span>
+                        <span class="original-price">${(product.precio * 1.25).toFixed(2)} MXN</span>
                         <span class="discount-badge">20% OFF</span>
                     </div>
                 </div>
@@ -964,8 +1066,9 @@ const ProductManager = {
             
                 <div class="product-details">
                     <div class="tallas-container">
-                        <strong>Tallas:</strong>
+                        <strong>Tallas disponibles:</strong>
                         <div class="tallas-list">${tallasHTML}</div>
+                        ${!hasStock ? '<p class="no-stock-message">Producto temporalmente agotado</p>' : ''}
                     </div>
                 </div>
                 
@@ -974,54 +1077,102 @@ const ProductManager = {
                     data-name="${product.nombre}"
                     data-price="${product.precio}"
                     data-image="${productImage}"
+                    ${!hasStock ? 'disabled' : ''}
                     disabled>
-                    <i class="fas fa-shopping-cart"></i> Selecciona una talla
+                    <i class="fas fa-shopping-cart"></i> 
+                    ${!hasStock ? 'Sin Stock' : 'Selecciona una talla'}
                 </button>
+                
+                ${hasStock ? `
+                <div class="paypal-button-individual" data-product-id="${product.codigo}" style="margin-top: 10px; display: none;">
+                    <!-- Botón PayPal individual se renderizará aquí -->
+                </div>
+                ` : ''}
             </div>
             <div class="delivery-info">
                 <span class="delivery-icon">🚚</span>
                 <div class="delivery-text">
-                    <span>Dias de entrega Miercoles y Sabado</span>
+                    <span>Entrega: Miércoles y Sábado</span>
                 </div>
             </div>
         `;
 
-        this.bindProductEvents(productDiv);
+        this.bindProductEventsWithStock(productDiv, product);
         return productDiv;
     },
 
-    bindProductEvents(productElement) {
-        const tallaBtns = productElement.querySelectorAll('.talla-btn');
+    createTallasWithStock(tallasInfo) {
+        if (!Array.isArray(tallasInfo)) return '';
+        
+        return tallasInfo.map(tallaInfo => {
+            const isAvailable = tallaInfo.stock > 0 && tallaInfo.activo;
+            const stockText = tallaInfo.stock <= 5 ? ` (${tallaInfo.stock})` : '';
+            
+            return `<button class="talla-btn ${!isAvailable ? 'no-stock' : ''}" 
+                        data-talla="${tallaInfo.talla}"
+                        data-stock="${tallaInfo.stock}"
+                        ${!isAvailable ? 'disabled' : ''}>
+                        ${tallaInfo.talla}${stockText}
+                    </button>`;
+        }).join('');
+    },
+
+    bindProductEventsWithStock(productElement, product) {
+        const tallaBtns = productElement.querySelectorAll('.talla-btn:not(.no-stock)');
         const addToCartBtn = productElement.querySelector('.add-to-cart-btn');
+        const paypalContainer = productElement.querySelector('.paypal-button-individual');
+        let selectedTalla = null;
+        let selectedStock = 0;
+        
+        // Inicializar zoom
         const imageContainer = productElement.querySelector('.product-image-container');
         const image = productElement.querySelector('.product-image');
         const lens = productElement.querySelector('.zoom-lens');
-        
-        // Inicializar el zoom para este producto específico
-        this.initZoomForProduct(imageContainer, image, lens);
-        
+
+        // Inicializar zoom para este producto específico
+        if (imageContainer && image && lens) {
+            ZoomManager.initZoomForProduct(imageContainer, image, lens);
+        }
+
         // Manejar selección de tallas
         tallaBtns.forEach(btn => {
             btn.addEventListener('click', function() {
                 tallaBtns.forEach(b => b.classList.remove('selected'));
                 this.classList.add('selected');
-                const selectedSize = this.dataset.talla;
                 
-                addToCartBtn.disabled = false;
-                addToCartBtn.innerHTML = '<i class="fas fa-shopping-cart"></i> Agregar al Carrito';
-                addToCartBtn.dataset.selectedSize = selectedSize;
+                selectedTalla = this.dataset.talla;
+                selectedStock = parseInt(this.dataset.stock);
+                
+                if (addToCartBtn) {
+                    addToCartBtn.disabled = false;
+                    addToCartBtn.innerHTML = '<i class="fas fa-shopping-cart"></i> Agregar al Carrito';
+                    addToCartBtn.dataset.selectedTalla = selectedTalla;
+                }
+                
+                // Mostrar botón PayPal individual
+                if (paypalContainer) {
+                    paypalContainer.style.display = 'block';
+                    PayPalManager.renderIndividualButton(paypalContainer, product.codigo, selectedTalla);
+                }
             });
         });
 
         // Manejar agregar al carrito
         addToCartBtn?.addEventListener('click', (e) => {
             const button = e.target;
+            
+            if (!selectedTalla) {
+                NotificationManager.showError('Por favor selecciona una talla');
+                return;
+            }
+            
             const productData = {
                 id: button.dataset.id,
                 name: button.dataset.name,
-                price: button.dataset.price,
+                price: parseFloat(button.dataset.price),
                 image: button.dataset.image,
-                selectedSize: button.dataset.selectedSize
+                selectedSize: selectedTalla,
+                stock: selectedStock
             };
 
             const success = CartManager.addProduct(productData);
@@ -1031,121 +1182,40 @@ const ProductManager = {
                 const originalText = button.innerHTML;
                 button.innerHTML = '✓ Agregado';
                 button.style.backgroundColor = '#4CAF50';
-                button.disabled = true;
                 
                 setTimeout(() => {
                     button.innerHTML = originalText;
                     button.style.backgroundColor = '';
-                    button.disabled = false;
                 }, 2000);
+                
+                // Actualizar display de stock
+                const tallaBtn = productElement.querySelector(`[data-talla="${selectedTalla}"]`);
+                if (tallaBtn && selectedStock > 0) {
+                    const newStock = selectedStock - 1;
+                    tallaBtn.dataset.stock = newStock;
+                    if (newStock <= 5) {
+                        tallaBtn.textContent = `${selectedTalla} (${newStock})`;
+                    }
+                    if (newStock === 0) {
+                        tallaBtn.classList.add('no-stock');
+                        tallaBtn.disabled = true;
+                    }
+                }
             }
         });
-    },
-
-    // Función para inicializar el zoom para un solo producto
-    initZoomForProduct(container, image, lens) {
-        // Tamaño del lente de zoom
-        const lensSize = 80;
-        if (lens) {
-            lens.style.width = `${lensSize}px`;
-            lens.style.height = `${lensSize}px`;
-        }
-        
-        // Activar el zoom y seguimiento para desktop
-        container.addEventListener('mousemove', (e) => {
-            if (!container.classList.contains('zoom-active')) {
-                container.classList.add('zoom-active');
-            }
-            
-            const rect = container.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            // Calcular porcentaje para transform-origin
-            const percentX = (x / rect.width) * 100;
-            const percentY = (y / rect.height) * 100;
-            
-            // Aplicar transform-origin para el zoom
-            image.style.transformOrigin = `${percentX}% ${percentY}%`;
-            
-            // Posicionar el lente de zoom
-            if (lens) {
-                lens.style.display = 'block';
-                lens.style.left = `${x - lensSize/2}px`;
-                lens.style.top = `${y - lensSize/2}px`;
-            }
-        });
-        
-        // Desactivar zoom al salir del contenedor
-        container.addEventListener('mouseleave', () => {
-            container.classList.remove('zoom-active');
-            if (lens) {
-                lens.style.display = 'none';
-            }
-            image.style.transformOrigin = 'center center';
-        });
-        
-        // Manejo de eventos táctiles para móvil
-        let touchActive = false;
-        
-        container.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            container.classList.add('zoom-active');
-            touchActive = true;
-            this.updateTouchPosition(e, container, image, lens, lensSize);
-        });
-        
-        container.addEventListener('touchmove', (e) => {
-            if (touchActive) {
-                e.preventDefault();
-                this.updateTouchPosition(e, container, image, lens, lensSize);
-            }
-        });
-        
-        container.addEventListener('touchend', () => {
-            container.classList.remove('zoom-active');
-            touchActive = false;
-            if (lens) {
-                lens.style.display = 'none';
-            }
-            image.style.transformOrigin = 'center center';
-        });
-    },
-    
-    // Función para inicializar el zoom para todos los productos
-    initZoomForProducts() {
-        const imageContainers = document.querySelectorAll('.product-image-container');
-        
-        imageContainers.forEach(container => {
-            const image = container.querySelector('.product-image');
-            const lens = container.querySelector('.zoom-lens');
-            
-            if (image && lens) {
-                this.initZoomForProduct(container, image, lens);
-            }
-        });
-    },
-            
-    updateTouchPosition(e, container, image, lens, lensSize) {
-        const rect = container.getBoundingClientRect();
-        const touch = e.touches[0];
-        const x = touch.clientX - rect.left;
-        const y = touch.clientY - rect.top;
-        
-        // Calcular porcentaje para transform-origin
-        const percentX = (x / rect.width) * 100;
-        const percentY = (y / rect.height) * 100;
-        
-        // Aplicar transform-origin para el zoom
-        image.style.transformOrigin = `${percentX}% ${percentY}%`;
-        
-        // Posicionar el lente de zoom
-        if (lens) {
-            lens.style.display = 'block';
-            lens.style.left = `${x - lensSize/2}px`;
-            lens.style.top = `${y - lensSize/2}px`;
-        }
     }
+};
+
+
+
+// Actualizar CartManager para re-renderizar PayPal cuando cambie el carrito
+const originalUpdateDisplay = CartManager.updateDisplay;
+CartManager.updateDisplay = function() {
+    originalUpdateDisplay.call(this);
+    // // Re-renderizar botón PayPal del carrito cuando cambie el contenido
+    // setTimeout(() => {
+    //     PayPalManager.renderCartButton();
+    // }, 100);
 };
 
 // ========== GESTIÓN DE NAVEGACIÓN MÓVIL ==========
@@ -1258,83 +1328,537 @@ const FormManager = {
     }
 };
 
-// ========== INTEGRACIÓN PAYPAL ==========
-const PayPalManager = {
-    init() {
-        this.renderProductButtons();
-        this.renderCartButton();
-    },
+// ========== INTEGRACIÓN PAYPAL CORREGIDA ==========
+// const PayPalManager = {
+//     init() {
+//         // ESPERAR A QUE EL DOM ESTÉ COMPLETAMENTE CARGADO
+//         if (document.readyState === 'loading') {
+//             document.addEventListener('DOMContentLoaded', () => {
+//                 this.renderCartButton();
+//             });
+//         } else {
+//             this.renderCartButton();
+//         }
+//     },
 
-    renderProductButtons() {
-        document.querySelectorAll('.product-card').forEach(card => {
-            const payPalContainer = card.querySelector('.paypal-button-container');
-            const itemId = card.dataset.itemId;
+//     renderCartButton() {
+//         const cartPayPalContainer = DOM_CACHE.paypalContainer || document.getElementById('paypalContainer');
+        
+//         // VERIFICACIONES MEJORADAS
+//         if (!cartPayPalContainer) {
+//             console.warn('Contenedor PayPal no encontrado');
+//             return;
+//         }
+        
+//         // Limpiar contenedor
+//         cartPayPalContainer.innerHTML = '';
+        
+//         if (cart.length === 0) {
+//             console.log('Carrito vacío, no renderizando PayPal');
+//             return;
+//         }
+        
+//         if (!window.paypal) {
+//             console.warn('PayPal SDK no cargado, esperando...');
+//             // REINTENTAR DESPUÉS DE UN MOMENTO
+//             setTimeout(() => {
+//                 if (window.paypal) {
+//                     this.renderCartButton();
+//                 } else {
+//                     console.error('PayPal SDK no disponible después de esperar');
+//                     cartPayPalContainer.innerHTML = '<p style="color: red;">Error: PayPal no disponible</p>';
+//                 }
+//             }, 1000);
+//             return;
+//         }
+
+//         console.log('Renderizando botón PayPal para carrito con', cart.length, 'items');
+
+//         try {
+//             window.paypal.Buttons({
+//                 style: {
+//                     layout: 'vertical',
+//                     color: 'gold',
+//                     shape: 'rect',
+//                     label: 'paypal',
+//                     height: 40
+//                 },
+                
+//                 createOrder: async (data, actions) => {
+//                     try {
+//                         console.log('Creando orden PayPal para carrito:', CartManager.getCart());
+                        
+//                         const response = await fetch('/api/paypal/create-order', {
+//                             method: 'POST',
+//                             headers: { 'Content-Type': 'application/json' },
+//                             body: JSON.stringify({ cart: CartManager.getCart() })
+//                         });
+                        
+//                         const order = await response.json();
+//                         if (order.success) {
+//                             return order.orderID;
+//                         } else {
+//                             throw new Error(order.message || 'No se pudo crear la orden del carrito');
+//                         }
+//                     } catch (err) {
+//                         console.error('Error creando orden del carrito:', err);
+//                         NotificationManager.showError('Error al procesar el pago del carrito');
+//                         throw err;
+//                     }
+//                 },
+                
+//                 onApprove: async (data, actions) => {
+//                     try {
+//                         const response = await fetch('/api/paypal/capture-order', {
+//                             method: 'POST',
+//                             headers: { 'Content-Type': 'application/json' },
+//                             body: JSON.stringify({ orderID: data.orderID })
+//                         });
+                        
+//                         const capture = await response.json();
+                        
+//                         if (capture.success) {
+//                             NotificationManager.showSuccess(
+//                                 `¡Pedido completado! Pedido #${capture.pedidoId} procesado exitosamente.`
+//                             );
+                            
+//                             // Limpiar carrito y cerrar
+//                             CartManager.clearCart();
+//                             CartManager.closeCart();
+                            
+//                             // Redireccionar a página de confirmación
+//                             setTimeout(() => {
+//                                 window.location.href = `/confirmacion?pedido=${capture.pedidoId}`;
+//                             }, 2000);
+                            
+//                         } else {
+//                             throw new Error(capture.message || 'Error al procesar el pago');
+//                         }
+                        
+//                     } catch (error) {
+//                         console.error('Error capturando pago del carrito:', error);
+//                         NotificationManager.showError('Error al completar el pago. Contacta soporte.');
+//                     }
+//                 },
+                
+//                 onError: (err) => {
+//                     console.error('Error PayPal carrito:', err);
+//                     NotificationManager.showError('Error durante el pago. Intenta de nuevo.');
+//                 },
+                
+//                 onCancel: (data) => {
+//                     console.log('Pago del carrito cancelado:', data);
+//                     NotificationManager.showError('Pago cancelado');
+//                 }
+                
+//             }).render(cartPayPalContainer).then(() => {
+//                 console.log('Botón PayPal renderizado exitosamente en carrito');
+//             }).catch((err) => {
+//                 console.error('Error renderizando botón PayPal:', err);
+//                 cartPayPalContainer.innerHTML = '<p style="color: red;">Error al cargar PayPal</p>';
+//             });
             
-            if (payPalContainer && itemId) {
-                const productInfo = { id: itemId };
-                this.renderButton(payPalContainer, productInfo);
-            }
-        });
-    },
+//         } catch (error) {
+//             console.error('Error creando botón PayPal:', error);
+//             cartPayPalContainer.innerHTML = '<p style="color: red;">Error al inicializar PayPal</p>';
+//         }
+//     },
 
-    renderCartButton() {
-        const cartPayPalContainer = DOM_CACHE.paypalContainer;
-        if (cartPayPalContainer && cart.length > 0) {
-            this.renderButton(cartPayPalContainer, { cart: true });
-        }
-    },
+//     // Mantener método para botones individuales
+//     renderIndividualButton(container, productId, talla) {
+//         // Limpiar contenedor
+//         container.innerHTML = '';
+        
+//         if (!window.paypal) {
+//             console.warn('PayPal SDK no cargado');
+//             return;
+//         }
 
-    renderButton(container, item) {
-        if (!window.paypal) {
-            console.warn('PayPal SDK no cargado');
+//         window.paypal.Buttons({
+//             style: {
+//                 layout: 'horizontal',
+//                 color: 'blue',
+//                 shape: 'rect',
+//                 label: 'pay',
+//                 height: 35
+//             },
+            
+//             createOrder: async (data, actions) => {
+//                 try {
+//                     const response = await fetch('/api/paypal/create-order', {
+//                         method: 'POST',
+//                         headers: { 'Content-Type': 'application/json' },
+//                         body: JSON.stringify({ 
+//                             productId: productId,
+//                             talla: talla
+//                         })
+//                     });
+                    
+//                     const order = await response.json();
+//                     if (order.success) {
+//                         return order.orderID;
+//                     } else {
+//                         throw new Error(order.message || 'No se pudo crear la orden');
+//                     }
+//                 } catch (err) {
+//                     console.error('Error creando orden individual:', err);
+//                     NotificationManager.showError('Error al procesar el pago');
+//                     throw err;
+//                 }
+//             },
+            
+//             onApprove: async (data, actions) => {
+//                 try {
+//                     const response = await fetch('/api/paypal/capture-order', {
+//                         method: 'POST',
+//                         headers: { 'Content-Type': 'application/json' },
+//                         body: JSON.stringify({ orderID: data.orderID })
+//                     });
+                    
+//                     const capture = await response.json();
+                    
+//                     if (capture.success) {
+//                         NotificationManager.showSuccess(
+//                             `¡Compra completada! Pedido #${capture.pedidoId} procesado exitosamente.`
+//                         );
+                        
+//                         setTimeout(() => {
+//                             window.location.href = `/confirmacion?pedido=${capture.pedidoId}`;
+//                         }, 2000);
+                        
+//                     } else {
+//                         throw new Error(capture.message || 'Error al procesar el pago');
+//                     }
+                    
+//                 } catch (error) {
+//                     console.error('Error capturando pago individual:', error);
+//                     NotificationManager.showError('Error al completar el pago. Contacta soporte.');
+//                 }
+//             },
+            
+//             onError: (err) => {
+//                 console.error('Error PayPal individual:', err);
+//                 NotificationManager.showError('Error durante el pago. Intenta de nuevo.');
+//             },
+            
+//             onCancel: (data) => {
+//                 console.log('Pago individual cancelado:', data);
+//                 NotificationManager.showError('Pago cancelado');
+//             }
+            
+//         }).render(container);
+//     }
+// };
+const PayPalManager = {
+    isSDKLoaded: false,
+    retryCount: 0,
+    maxRetries: 10,
+
+    init() {
+        // Verificar si el SDK ya está disponible
+        if (window.paypal) {
+            this.isSDKLoaded = true;
+            this.renderCartButton();
             return;
         }
 
+        // Esperar a que se cargue el SDK
+        this.waitForSDK();
+    },
+
+    waitForSDK() {
+        const checkSDK = () => {
+            if (window.paypal) {
+                console.log('PayPal SDK cargado exitosamente');
+                this.isSDKLoaded = true;
+                this.renderCartButton();
+                return;
+            }
+
+            this.retryCount++;
+            if (this.retryCount < this.maxRetries) {
+                console.log(`Esperando SDK de PayPal... intento ${this.retryCount}/${this.maxRetries}`);
+                setTimeout(checkSDK, 500);
+            } else {
+                console.error('PayPal SDK no pudo cargarse después de múltiples intentos');
+                this.showSDKError();
+            }
+        };
+
+        checkSDK();
+    },
+
+    showSDKError() {
+        const cartPayPalContainer = this.getPayPalContainer();
+        if (cartPayPalContainer) {
+            cartPayPalContainer.innerHTML = `
+                <div style="padding: 20px; background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px; color: #856404;">
+                    <strong>Error:</strong> No se pudo cargar PayPal. 
+                    <br>Verifica tu conexión e intenta recargar la página.
+                    <br><button onclick="location.reload()" style="margin-top: 10px; padding: 5px 10px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer;">Recargar</button>
+                </div>
+            `;
+        }
+    },
+
+    getPayPalContainer() {
+        return DOM_CACHE?.paypalContainer || document.getElementById('paypalContainer');
+    },
+
+    renderCartButton() {
+        if (!this.isSDKLoaded) {
+            console.warn('SDK no disponible, esperando...');
+            return;
+        }
+
+        const cartPayPalContainer = this.getPayPalContainer();
+        
+        if (!cartPayPalContainer) {
+            console.warn('Contenedor PayPal no encontrado');
+            return;
+        }
+        
+        // Limpiar contenedor
+        cartPayPalContainer.innerHTML = '';
+        
+        if (cart.length === 0) {
+            console.log('Carrito vacío, no renderizando PayPal');
+            return;
+        }
+
+        console.log('Renderizando botón PayPal para carrito con', cart.length, 'items');
+
+        try {
+            window.paypal.Buttons({
+                style: {
+                    layout: 'vertical',
+                    color: 'gold',
+                    shape: 'rect',
+                    label: 'paypal',
+                    height: 40
+                },
+                
+                createOrder: async (data, actions) => {
+                    try {
+                        console.log('Creando orden PayPal para carrito:', CartManager.getCart());
+                        
+                        const response = await fetch('/api/paypal/create-order', {
+                            method: 'POST',
+                            headers: { 
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            },
+                            credentials: 'include', // Para incluir cookies de sesión
+                            body: JSON.stringify({ cart: CartManager.getCart() })
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                        }
+                        
+                        const order = await response.json();
+                        if (order.success) {
+                            return order.orderID;
+                        } else {
+                            throw new Error(order.message || 'No se pudo crear la orden del carrito');
+                        }
+                    } catch (err) {
+                        console.error('Error creando orden del carrito:', err);
+                        NotificationManager?.showError('Error al procesar el pago del carrito');
+                        throw err;
+                    }
+                },
+                
+                onApprove: async (data, actions) => {
+                    try {
+                        const response = await fetch('/api/paypal/capture-order', {
+                            method: 'POST',
+                            headers: { 
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            },
+                            credentials: 'include',
+                            body: JSON.stringify({ orderID: data.orderID })
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                        }
+                        
+                        const capture = await response.json();
+                        
+                        if (capture.success) {
+                            NotificationManager?.showSuccess(
+                                `¡Pedido completado! Pedido #${capture.pedidoId} procesado exitosamente.`
+                            );
+                            
+                            // Limpiar carrito y cerrar
+                            CartManager?.clearCart();
+                            CartManager?.closeCart();
+                            
+                            // Redireccionar a página de confirmación
+                            setTimeout(() => {
+                                window.location.href = `/confirmacion?pedido=${capture.pedidoId}`;
+                            }, 2000);
+                            
+                        } else {
+                            throw new Error(capture.message || 'Error al procesar el pago');
+                        }
+                        
+                    } catch (error) {
+                        console.error('Error capturando pago del carrito:', error);
+                        NotificationManager?.showError('Error al completar el pago. Contacta soporte.');
+                    }
+                },
+                
+                onError: (err) => {
+                    console.error('Error PayPal carrito:', err);
+                    NotificationManager?.showError('Error durante el pago. Intenta de nuevo.');
+                },
+                
+                onCancel: (data) => {
+                    console.log('Pago del carrito cancelado:', data);
+                    NotificationManager?.showError('Pago cancelado');
+                }
+                
+            }).render(cartPayPalContainer).then(() => {
+                console.log('Botón PayPal renderizado exitosamente en carrito');
+            }).catch((err) => {
+                console.error('Error renderizando botón PayPal:', err);
+                cartPayPalContainer.innerHTML = '<p style="color: red;">Error al cargar PayPal. Intenta recargar la página.</p>';
+            });
+            
+        } catch (error) {
+            console.error('Error creando botón PayPal:', error);
+            cartPayPalContainer.innerHTML = '<p style="color: red;">Error al inicializar PayPal</p>';
+        }
+    },
+
+    // Método mejorado para botones individuales
+    renderIndividualButton(container, productId, talla) {
+        if (!this.isSDKLoaded) {
+            console.warn('SDK no disponible para botón individual');
+            if (container) {
+                container.innerHTML = '<p>Cargando PayPal...</p>';
+            }
+            // Reintentar cuando esté disponible
+            setTimeout(() => {
+                if (this.isSDKLoaded) {
+                    this.renderIndividualButton(container, productId, talla);
+                }
+            }, 1000);
+            return;
+        }
+
+        if (!container) {
+            console.error('Contenedor no encontrado para botón individual');
+            return;
+        }
+
+        // Limpiar contenedor
+        container.innerHTML = '';
+
         window.paypal.Buttons({
+            style: {
+                layout: 'horizontal',
+                color: 'blue',
+                shape: 'rect',
+                label: 'pay',
+                height: 35
+            },
+            
             createOrder: async (data, actions) => {
                 try {
-                    const body = item.cart 
-                        ? { cart: CartManager.getCart() }
-                        : { itemId: item.id };
-
                     const response = await fetch('/api/paypal/create-order', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(body)
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify({ 
+                            productId: productId,
+                            talla: talla
+                        })
                     });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
                     
                     const order = await response.json();
                     if (order.success) {
-                        console.log(`Orden creada con ID: ${order.orderID}`);
                         return order.orderID;
                     } else {
-                        throw new Error('No se pudo crear la orden en el servidor.');
+                        throw new Error(order.message || 'No se pudo crear la orden');
                     }
                 } catch (err) {
-                    console.error('Error al crear la orden de PayPal:', err);
-                    NotificationManager.showError('Error al procesar el pago');
+                    console.error('Error creando orden individual:', err);
+                    NotificationManager?.showError('Error al procesar el pago');
+                    throw err;
                 }
             },
             
-            onApprove: (data, actions) => {
-                console.log('Transacción aprobada:', data);
-                return actions.order.capture().then(details => {
-                    NotificationManager.showSuccess(
-                        `Transacción completada por ${details.payer.name.given_name}. ¡Gracias por tu compra!`
-                    );
-                    if (item.cart) {
-                        CartManager.clearCart();
+            onApprove: async (data, actions) => {
+                try {
+                    const response = await fetch('/api/paypal/capture-order', {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify({ orderID: data.orderID })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                     }
-                });
+                    
+                    const capture = await response.json();
+                    
+                    if (capture.success) {
+                        NotificationManager?.showSuccess(
+                            `¡Compra completada! Pedido #${capture.pedidoId} procesado exitosamente.`
+                        );
+                        
+                        setTimeout(() => {
+                            window.location.href = `/confirmacion?pedido=${capture.pedidoId}`;
+                        }, 2000);
+                        
+                    } else {
+                        throw new Error(capture.message || 'Error al procesar el pago');
+                    }
+                    
+                } catch (error) {
+                    console.error('Error capturando pago individual:', error);
+                    NotificationManager?.showError('Error al completar el pago. Contacta soporte.');
+                }
             },
             
             onError: (err) => {
-                console.error('Error en el proceso de pago de PayPal:', err);
-                NotificationManager.showError('Ocurrió un error durante el pago. Por favor, intenta de nuevo.');
+                console.error('Error PayPal individual:', err);
+                NotificationManager?.showError('Error durante el pago. Intenta de nuevo.');
+            },
+            
+            onCancel: (data) => {
+                console.log('Pago individual cancelado:', data);
+                NotificationManager?.showError('Pago cancelado');
             }
-        }).render(container);
+            
+        }).render(container).catch((err) => {
+            console.error('Error renderizando botón individual:', err);
+            container.innerHTML = '<p style="color: red;">Error al cargar PayPal</p>';
+        });
     }
 };
+
+// Inicializar cuando el DOM esté listo
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => PayPalManager.init());
+} else {
+    PayPalManager.init();
+}
 
 // ========== OPTIMIZACIONES DE RENDIMIENTO ==========
 const PerformanceOptimizer = {

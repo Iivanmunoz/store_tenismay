@@ -4,6 +4,7 @@ require('dotenv').config();
 // | Requerimientos e Inicialización del Servidor                              |
 // -----------------------------------------------------------------------------
 const express = require('express');
+const cors = require('cors');
 const path = require('path');
 const bodyParser = require('body-parser');
 const mysql = require('mysql2/promise');
@@ -18,6 +19,7 @@ const MySQLStore = require('express-mysql-session')(session);
 // -----------------------------------------------------------------------------
 const { verifyConnection } = require('./services/emailService');
 const { sendPasswordResetEmail } = require('./services/emailService');
+const { PayPalService } = require('./services/paypalService');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -26,10 +28,10 @@ const PORT = process.env.PORT || 3000;
 // | Configuración de la Base de Datos MySQL                                   |
 // -----------------------------------------------------------------------------
 const dbConfig = {
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || 'Jm2020mx',
-    database: process.env.DB_NAME || 'tennis_BD',
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
     port: process.env.DB_PORT || 3306,
     waitForConnections: true,
     connectionLimit: 10,
@@ -87,6 +89,16 @@ app.use(session({
         secure: false // cambiar a true en producción con HTTPS
     }
 }));
+
+// Configuración CORS
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://yourdomain.com'] 
+    : ['http://localhost:3000', 'http://127.0.0.1:3000'],
+  credentials: true
+}));
+
+app.use(express.json({ limit: '10mb' }));
 
 // -----------------------------------------------------------------------------
 // | Rutas de Autenticación                                                    |
@@ -341,31 +353,106 @@ app.get('/api/contactos/:id', requireAuth, async (req, res) => {
     }
 });
 
-// // Ruta para obtener todos los productos
-// app.get('/api/productos', async (req, res) => {
-//     try {
-//         const query = 'SELECT codigo, nombre, precio, tallas_disponibles, nivel_stock FROM productos';
-//         const [productos] = await pool.execute(query);
+// Ruta adicional para página de confirmación
+app.get('/confirmacion', requireAuth, async (req, res) => {
+    const pedidoId = req.query.pedido;
+    const clienteId = req.session.userId;
+    
+    if (!pedidoId) {
+        return res.redirect('/');
+    }
+    
+    try {
+        const [pedidoInfo] = await pool.execute(`
+            SELECT 
+                p.id,
+                p.monto_total,
+                p.estado,
+                p.fecha_pedido,
+                c.nombre as cliente_nombre,
+                c.correo_electronico,
+                GROUP_CONCAT(
+                    CONCAT(pr.nombre, ' - Talla: ', ip.talla, ' (Cant: ', ip.cantidad, ')')
+                    SEPARATOR '<br>'
+                ) as productos_detalle
+            FROM pedidos p
+            INNER JOIN clientes c ON p.cliente_id = c.id
+            INNER JOIN items_pedido ip ON p.id = ip.pedido_id
+            INNER JOIN productos pr ON ip.producto_id = pr.id
+            WHERE p.id = ? AND p.cliente_id = ?
+            GROUP BY p.id
+        `, [pedidoId, clienteId]);
         
-//         console.log('--- Búsqueda de Productos ---');
-//         console.log(`Productos encontrados: ${productos.length}`);
-//         console.log('-----------------------------');
+        if (pedidoInfo.length === 0) {
+            return res.status(404).send('Pedido no encontrado');
+        }
         
-//         res.json({
-//             success: true,
-//             message: 'Productos obtenidos exitosamente',
-//             data: productos
-//         });
-//     } catch (error) {
-//         console.error('Error en búsqueda de productos:', error);
-//         res.status(500).json({
-//             success: false,
-//             message: 'Error interno del servidor.',
-//             data: []
-//         });
-//     }
-// });
+        // Aquí podrías renderizar una página de confirmación
+        // Por ahora, devolvemos JSON o redirigimos al inicio con mensaje
+        res.send(`
+            <html>
+                <head><title>Pedido Confirmado</title></head>
+                <body style="font-family: Arial; text-align: center; padding: 50px;">
+                    <h1>¡Pedido Confirmado!</h1>
+                    <h2>Pedido #${pedidoId}</h2>
+                    <p><strong>Cliente:</strong> ${pedidoInfo[0].cliente_nombre}</p>
+                    <p><strong>Total:</strong> ${pedidoInfo[0].monto_total} MXN</p>
+                    <p><strong>Estado:</strong> ${pedidoInfo[0].estado}</p>
+                    <p><strong>Productos:</strong></p>
+                    <div style="text-align: left; max-width: 500px; margin: 0 auto;">
+                        ${pedidoInfo[0].productos_detalle}
+                    </div>
+                    <br>
+                    <a href="/" style="background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+                        Volver al Inicio
+                    </a>
+                </body>
+            </html>
+        `);
+        
+    } catch (error) {
+        console.error('Error obteniendo información del pedido:', error);
+        res.status(500).send('Error obteniendo información del pedido');
+    }
+});
 
+// Ruta para obtener historial de pedidos del cliente
+app.get('/api/pedidos/historial', requireAuth, async (req, res) => {
+    const clienteId = req.session.userId;
+    
+    try {
+        const [pedidos] = await pool.execute(`
+            SELECT 
+                p.id,
+                p.monto_total,
+                p.estado,
+                p.fecha_pedido,
+                p.actualizado_en,
+                GROUP_CONCAT(
+                    CONCAT(pr.nombre, ' (Talla: ', ip.talla, ', Cant: ', ip.cantidad, ')')
+                    SEPARATOR '; '
+                ) as productos
+            FROM pedidos p
+            INNER JOIN items_pedido ip ON p.id = ip.pedido_id
+            INNER JOIN productos pr ON ip.producto_id = pr.id
+            WHERE p.cliente_id = ?
+            GROUP BY p.id
+            ORDER BY p.fecha_pedido DESC
+        `, [clienteId]);
+        
+        res.json({
+            success: true,
+            data: pedidos
+        });
+        
+    } catch (error) {
+        console.error('Error obteniendo historial:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error obteniendo historial de pedidos'
+        });
+    }
+});
 
 // -----------------------------------------------------------------------------
 // | Rutas para productos                                                      |
@@ -374,20 +461,61 @@ app.get('/api/contactos/:id', requireAuth, async (req, res) => {
 // Filtrar productos por tipo (originales)
 app.get('/api/productos/originales', async (req, res) => {
     try {
-        const query = 'SELECT codigo, nombre, precio, tallas_disponibles, nivel_stock FROM productos WHERE tipo = "original"';
+        const query = `
+            SELECT 
+                p.id,
+                p.codigo,
+                p.nombre,
+                p.precio,
+                p.tipo,
+                p.nivel_stock,
+                JSON_ARRAYAGG(
+                    JSON_OBJECT(
+                        'talla', t.talla,
+                        'stock', pt.stock,
+                        'precio_ajuste', COALESCE(pt.precio_ajuste, 0),
+                        'activo', pt.activo
+                    )
+                ) as tallas_info
+            FROM productos p
+            LEFT JOIN producto_tallas pt ON p.id = pt.producto_id
+            LEFT JOIN tallas t ON pt.talla_id = t.id
+            WHERE p.tipo = 'original' AND pt.activo = 1
+            GROUP BY p.id, p.codigo, p.nombre, p.precio, p.tipo, p.nivel_stock
+            HAVING JSON_LENGTH(tallas_info) > 0
+            ORDER BY p.nombre
+        `;
+        
         const [productos] = await pool.execute(query);
         
-        console.log('--- Productos Originales ---');
-        console.log(`Productos encontrados: ${productos.length}`);
-        console.log('---------------------------');
+        // Procesar tallas_info para cada producto
+        const productosConTallas = productos.map(producto => {
+            try {
+                producto.tallas_info = typeof producto.tallas_info === 'string' 
+                    ? JSON.parse(producto.tallas_info) 
+                    : producto.tallas_info;
+                
+                // Filtrar tallas activas con stock > 0
+                producto.tallas_info = producto.tallas_info.filter(t => t.activo && t.stock > 0);
+                
+                // Crear array de tallas disponibles para compatibilidad
+                producto.tallas_disponibles = producto.tallas_info.map(t => t.talla);
+            } catch (e) {
+                console.error('Error procesando tallas para producto:', producto.codigo, e);
+                producto.tallas_info = [];
+                producto.tallas_disponibles = [];
+            }
+            return producto;
+        });
         
         res.json({
             success: true,
-            message: 'Productos originales obtenidos exitosamente',
-            data: productos
+            message: 'Productos originales con información de tallas',
+            data: productosConTallas
         });
+        
     } catch (error) {
-        console.error('Error en búsqueda de productos originales:', error);
+        console.error('Error en productos originales:', error);
         res.status(500).json({
             success: false,
             message: 'Error interno del servidor.',
@@ -399,20 +527,61 @@ app.get('/api/productos/originales', async (req, res) => {
 // Filtrar productos por tipo (falsificaciones)
 app.get('/api/productos/falsificaciones', async (req, res) => {
     try {
-        const query = 'SELECT codigo, nombre, precio, tallas_disponibles, nivel_stock FROM productos WHERE tipo = "falsificacion"';
+        const query = `
+            SELECT 
+                p.id,
+                p.codigo,
+                p.nombre,
+                p.precio,
+                p.tipo,
+                p.nivel_stock,
+                JSON_ARRAYAGG(
+                    JSON_OBJECT(
+                        'talla', t.talla,
+                        'stock', pt.stock,
+                        'precio_ajuste', COALESCE(pt.precio_ajuste, 0),
+                        'activo', pt.activo
+                    )
+                ) as tallas_info
+            FROM productos p
+            LEFT JOIN producto_tallas pt ON p.id = pt.producto_id
+            LEFT JOIN tallas t ON pt.talla_id = t.id
+            WHERE p.tipo = 'falsificacion' AND pt.activo = 1
+            GROUP BY p.id, p.codigo, p.nombre, p.precio, p.tipo, p.nivel_stock
+            HAVING JSON_LENGTH(tallas_info) > 0
+            ORDER BY p.nombre
+        `;
+        
         const [productos] = await pool.execute(query);
         
-        console.log('--- Productos Falsificaciones ---');
-        console.log(`Productos encontrados: ${productos.length}`);
-        console.log('--------------------------------');
+        // Procesar tallas_info para cada producto
+        const productosConTallas = productos.map(producto => {
+            try {
+                producto.tallas_info = typeof producto.tallas_info === 'string' 
+                    ? JSON.parse(producto.tallas_info) 
+                    : producto.tallas_info;
+                
+                // Filtrar tallas activas con stock > 0
+                producto.tallas_info = producto.tallas_info.filter(t => t.activo && t.stock > 0);
+                
+                // Crear array de tallas disponibles para compatibilidad
+                producto.tallas_disponibles = producto.tallas_info.map(t => t.talla);
+            } catch (e) {
+                console.error('Error procesando tallas para producto:', producto.codigo, e);
+                producto.tallas_info = [];
+                producto.tallas_disponibles = [];
+            }
+            return producto;
+        });
         
         res.json({
             success: true,
-            message: 'Productos falsificaciones obtenidos exitosamente',
-            data: productos
+            message: 'Productos falsificaciones con información de tallas',
+            data: productosConTallas
         });
+        
     } catch (error) {
-        console.error('Error en búsqueda de productos falsificaciones:', error);
+        console.error('Error en productos falsificaciones:', error);
         res.status(500).json({
             success: false,
             message: 'Error interno del servidor.',
@@ -512,14 +681,362 @@ app.get('/api/productos/falsificaciones/mas-baratas', async (req, res) => {
         });
     }
 });
-// Ruta PayPal (protegida)
+
+// Ruta para crear orden de PayPal con integración completa
 app.post('/api/paypal/create-order', requireAuth, async (req, res) => {
-    console.log("Creando orden de PayPal para el usuario:", req.session.userId);
-    console.log("Item:", req.body.itemId);
+    const { cart, productId, talla } = req.body;
+    const clienteId = req.session.userId;
     
-    const orderID = `PAYPAL_ORDER_${Date.now()}`;
-    res.json({ success: true, orderID: orderID });
-});    
+    const connection = await pool.getConnection();
+    
+    try {
+        await connection.beginTransaction();
+        
+        let items = [];
+        let montoTotal = 0;
+        let pedidoId = null;
+        
+        // Crear el pedido principal
+        const [pedidoResult] = await connection.execute(
+            'INSERT INTO pedidos (cliente_id, monto_total, estado, fecha_pedido) VALUES (?, ?, ?, NOW())',
+            [clienteId, 0, 'PENDIENTE'] // Monto temporal, se actualizará después
+        );
+        
+        pedidoId = pedidoResult.insertId;
+        
+        if (cart && Array.isArray(cart)) {
+            // Compra desde el carrito (múltiples productos)
+            for (const item of cart) {
+                // Verificar producto y talla
+                const [productoCheck] = await connection.execute(
+                    'SELECT p.id, p.codigo, p.nombre, p.precio, pt.stock, pt.precio_ajuste FROM productos p ' +
+                    'INNER JOIN producto_tallas pt ON p.id = pt.producto_id ' +
+                    'INNER JOIN tallas t ON pt.talla_id = t.id ' +
+                    'WHERE p.codigo = ? AND t.talla = ? AND pt.activo = 1',
+                    [item.id.split('_')[0], item.size]
+                );
+                
+                if (productoCheck.length === 0) {
+                    throw new Error(`Producto ${item.name} talla ${item.size} no disponible`);
+                }
+                
+                const producto = productoCheck[0];
+                const precioFinal = producto.precio + (producto.precio_ajuste || 0);
+                const subtotal = precioFinal * item.quantity;
+                
+                // Verificar stock
+                if (producto.stock < item.quantity) {
+                    throw new Error(`Stock insuficiente para ${item.name} talla ${item.size}. Stock disponible: ${producto.stock}`);
+                }
+                
+                // Insertar item del pedido
+                await connection.execute(
+                    'INSERT INTO items_pedido (pedido_id, producto_id, cantidad, talla, precio_compra) VALUES (?, ?, ?, ?, ?)',
+                    [pedidoId, producto.id, item.quantity, item.size, precioFinal]
+                );
+                
+                // Actualizar stock (reservar)
+                await connection.execute(
+                    'UPDATE producto_tallas SET stock = stock - ? WHERE producto_id = ? AND talla_id = (SELECT id FROM tallas WHERE talla = ?)',
+                    [item.quantity, producto.id, item.size]
+                );
+                
+                montoTotal += subtotal;
+                
+                items.push({
+                    name: producto.nombre,
+                    unit_amount: {
+                        currency_code: 'MXN',
+                        value: precioFinal.toFixed(2)
+                    },
+                    quantity: item.quantity.toString(),
+                    description: `Talla: ${item.size}`,
+                    sku: producto.codigo
+                });
+            }
+            
+        } else if (productId && talla) {
+            // Compra individual
+            const [productoData] = await connection.execute(
+                'SELECT p.id, p.codigo, p.nombre, p.precio, pt.stock, pt.precio_ajuste FROM productos p ' +
+                'INNER JOIN producto_tallas pt ON p.id = pt.producto_id ' +
+                'INNER JOIN tallas t ON pt.talla_id = t.id ' +
+                'WHERE p.codigo = ? AND t.talla = ? AND pt.activo = 1',
+                [productId, talla]
+            );
+            
+            if (productoData.length === 0) {
+                throw new Error('Producto no encontrado o no disponible');
+            }
+            
+            const producto = productoData[0];
+            const precioFinal = producto.precio + (producto.precio_ajuste || 0);
+            
+            if (producto.stock < 1) {
+                throw new Error(`Producto sin stock disponible`);
+            }
+            
+            // Insertar item del pedido
+            await connection.execute(
+                'INSERT INTO items_pedido (pedido_id, producto_id, cantidad, talla, precio_compra) VALUES (?, ?, ?, ?, ?)',
+                [pedidoId, producto.id, 1, talla, precioFinal]
+            );
+            
+            // Reservar stock
+            await connection.execute(
+                'UPDATE producto_tallas SET stock = stock - 1 WHERE producto_id = ? AND talla_id = (SELECT id FROM tallas WHERE talla = ?)',
+                [producto.id, talla]
+            );
+            
+            montoTotal = precioFinal;
+            
+            items = [{
+                name: producto.nombre,
+                unit_amount: {
+                    currency_code: 'MXN',
+                    value: precioFinal.toFixed(2)
+                },
+                quantity: '1',
+                description: `Talla: ${talla}`,
+                sku: producto.codigo
+            }];
+        } else {
+            throw new Error('Datos de compra inválidos');
+        }
+        
+        // Actualizar monto total del pedido
+        await connection.execute(
+            'UPDATE pedidos SET monto_total = ? WHERE id = ?',
+            [montoTotal, pedidoId]
+        );
+        
+        // Crear orden PayPal
+        const orderResult = await PayPalService.createOrder(items, montoTotal);
+        
+        if (orderResult.success) {
+            // Insertar transacción
+            await connection.execute(
+                'INSERT INTO transacciones (pedido_id, cliente_id, monto, metodo_pago, estado, fecha_transaccion) VALUES (?, ?, ?, ?, ?, NOW())',
+                [pedidoId, clienteId, montoTotal, 'PAYPAL', 'PENDIENTE']
+            );
+            
+            await connection.commit();
+            
+            console.log('--- Orden PayPal Creada ---');
+            console.log(`Cliente ID: ${clienteId}`);
+            console.log(`Pedido ID: ${pedidoId}`);
+            console.log(`PayPal Order ID: ${orderResult.orderID}`);
+            console.log(`Total: ${montoTotal} MXN`);
+            console.log('---------------------------');
+            
+            res.json({
+                success: true,
+                orderID: orderResult.orderID,
+                pedidoId: pedidoId,
+                total: montoTotal
+            });
+        } else {
+            throw new Error(orderResult.error);
+        }
+        
+    } catch (error) {
+        await connection.rollback();
+        console.error('Error en create-order:', error);
+        
+        // Si hay un pedido creado, marcarlo como cancelado
+        if (pedidoId) {
+            try {
+                await connection.execute(
+                    'UPDATE pedidos SET estado = ? WHERE id = ?',
+                    ['CANCELADO', pedidoId]
+                );
+            } catch (updateError) {
+                console.error('Error actualizando pedido cancelado:', updateError);
+            }
+        }
+        
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Error interno del servidor'
+        });
+    } finally {
+        connection.release();
+    }
+});
+
+// Ruta para capturar el pago
+app.post('/api/paypal/capture-order', requireAuth, async (req, res) => {
+    const { orderID } = req.body;
+    const clienteId = req.session.userId;
+    
+    const connection = await pool.getConnection();
+    
+    try {
+        await connection.beginTransaction();
+        
+        const captureResult = await PayPalService.captureOrder(orderID);
+        
+        if (captureResult.success) {
+            // Buscar el pedido asociado a esta transacción
+            const [transaccionData] = await connection.execute(
+                'SELECT t.*, p.id as pedido_id FROM transacciones t ' +
+                'INNER JOIN pedidos p ON t.pedido_id = p.id ' +
+                'WHERE t.cliente_id = ? AND t.estado = "PENDIENTE" ' +
+                'ORDER BY t.fecha_transaccion DESC LIMIT 1',
+                [clienteId]
+            );
+            
+            if (transaccionData.length === 0) {
+                throw new Error('Transacción no encontrada');
+            }
+            
+            const transaccion = transaccionData[0];
+            
+            // Actualizar transacción como completada
+            await connection.execute(
+                'UPDATE transacciones SET estado = ?, creado_en = NOW(), actualizado_en = NOW() WHERE id = ?',
+                ['COMPLETADO', transaccion.id]
+            );
+            
+            // Actualizar pedido como completado
+            await connection.execute(
+                'UPDATE pedidos SET estado = ?, actualizado_en = NOW() WHERE id = ?',
+                ['COMPLETADO', transaccion.pedido_id]
+            );
+            
+            // Actualizar gasto total del cliente
+            await connection.execute(
+                'UPDATE clientes SET gasto_total = gasto_total + ?, actualizado_en = NOW() WHERE id = ?',
+                [transaccion.monto, clienteId]
+            );
+            
+            await connection.commit();
+            
+            console.log('--- Pago Capturado y Procesado ---');
+            console.log(`PayPal Order ID: ${orderID}`);
+            console.log(`Capture ID: ${captureResult.captureID}`);
+            console.log(`Pedido ID: ${transaccion.pedido_id}`);
+            console.log(`Cliente ID: ${clienteId}`);
+            console.log(`Monto: ${transaccion.monto} MXN`);
+            console.log('--------------------------------');
+            
+            res.json({
+                success: true,
+                captureID: captureResult.captureID,
+                pedidoId: transaccion.pedido_id,
+                details: captureResult.details
+            });
+        } else {
+            throw new Error(captureResult.error);
+        }
+        
+    } catch (error) {
+        await connection.rollback();
+        console.error('Error en capture-order:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Error interno del servidor'
+        });
+    } finally {
+        connection.release();
+    }
+});
+
+// -----------------------------------------------------------------------------
+// | Rutas PayPal adicionales                                                  |
+// -----------------------------------------------------------------------------
+
+// Importar rutas de PayPal
+const paypalRoutes = require('./services/paypalRoutes');
+
+// Usar las rutas de PayPal
+app.use('/api/paypal', paypalRoutes);
+
+// Rutas de checkout
+app.get('/checkout', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views/checkout.html'));
+});
+
+// Páginas de resultado de pago
+app.get('/payment-success', (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Pago Exitoso - TENIS2_SHOP</title>
+      <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+        .success { color: green; font-size: 24px; margin-bottom: 20px; }
+        .details { background: #f0f8f0; padding: 20px; border-radius: 8px; margin: 20px auto; max-width: 500px; }
+      </style>
+    </head>
+    <body>
+      <div class="success">¡Pago completado exitosamente! ✓</div>
+      <div class="details">
+        <h3>Detalles del pago:</h3>
+        <p><strong>ID de Orden:</strong> ${req.query.orderId || 'N/A'}</p>
+        <p><strong>ID de Captura:</strong> ${req.query.captureId || 'N/A'}</p>
+        <p><strong>Fecha:</strong> ${new Date().toLocaleString('es-ES')}</p>
+      </div>
+      <a href="/">Volver al inicio</a>
+    </body>
+    </html>
+  `);
+});
+
+app.get('/payment-cancelled', (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Pago Cancelado - TENIS2_SHOP</title>
+      <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+        .cancelled { color: orange; font-size: 24px; margin-bottom: 20px; }
+      </style>
+    </head>
+    <body>
+      <div class="cancelled">Pago cancelado</div>
+      <p>Has cancelado el proceso de pago. Puedes intentarlo de nuevo cuando gustes.</p>
+      <a href="/checkout">Volver al checkout</a> | 
+      <a href="/">Ir al inicio</a>
+    </body>
+    </html>
+  `);
+});
+
+app.get('/payment-error', (req, res) => {
+  const message = req.query.message || 'error-desconocido';
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Error en el Pago - TENIS2_SHOP</title>
+      <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+        .error { color: red; font-size: 24px; margin-bottom: 20px; }
+      </style>
+    </head>
+    <body>
+      <div class="error">Error en el pago ✗</div>
+      <p>Ocurrió un error procesando tu pago: ${message.replace(/-/g, ' ')}</p>
+      <a href="/checkout">Intentar de nuevo</a> | 
+      <a href="/">Ir al inicio</a>
+    </body>
+    </html>
+  `);
+});
+
+// API de prueba para verificar configuración
+app.get('/api/test', (req, res) => {
+  res.json({
+    success: true,
+    message: 'API funcionando correctamente',
+    environment: process.env.NODE_ENV,
+    paypal_configured: !!(process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET),
+    timestamp: new Date().toISOString()
+  });
+});
 
 // Manejo de cierre graceful
 process.on('SIGTERM', async () => {
@@ -619,6 +1136,13 @@ app.post('/api/auth/forgot-password', async (req, res) => {
 // | Inicio del Servidor                                                       |
 // -----------------------------------------------------------------------------
 app.listen(PORT, () => {
-    console.log(`Servidor iniciado en http://localhost:${PORT}`);
+    console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+    console.log(`📦 Entorno: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`💳 PayPal configurado: ${!!(process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET)}`);
+    
+    if (!process.env.PAYPAL_CLIENT_ID || !process.env.PAYPAL_CLIENT_SECRET) {
+        console.warn('⚠️  ADVERTENCIA: Credenciales de PayPal no configuradas');
+    }
+    
     console.log('Conectando a MySQL...');
 });
