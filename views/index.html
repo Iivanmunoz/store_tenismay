@@ -15,7 +15,6 @@
     <link rel="stylesheet" href="/css/style.css">
 
     <!-- PayPal SDK - Reemplaza YOUR_CLIENT_ID con tu Client ID real -->
-    <script src="https://www.paypal.com/sdk/js?client-id=YOUR_CLIENT_ID&currency=MXN" defer></script>
 
 </head>
 <body>
@@ -445,9 +444,9 @@
             </div>
             <div class="cart-actions">
                 <button class="clear-cart-btn" id="clearCart">Vaciar Carrito</button>
-                <div class="paypal-checkout-container" id="paypalContainer">
+                <div id="paypal-button-container" style="display: none;"></div>
                     <!-- Botón de PayPal se renderizará aquí -->
-                </div>
+                
             </div>
         </div>
     </div>
