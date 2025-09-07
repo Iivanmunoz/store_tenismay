@@ -889,91 +889,90 @@ const ZoomManager = {
 
     // Inicializar zoom para un producto específico
     initZoomForProduct(container, image, lens) {
-        if (!container || !image || !lens) return;
+    if (!container || !image || !lens) return;
 
-        let isZooming = false;
+    // Crear una imagen de alta resolución para el zoom
+    const zoomImg = new Image();
+    zoomImg.src = image.src;
 
-        // Mostrar/ocultar lens al entrar/salir del contenedor
-        container.addEventListener('mouseenter', () => {
-            lens.style.display = 'block';
-            container.querySelector('.zoom-indicator')?.classList.add('active');
-        });
+    // Configurar estilos base del lente
+    lens.style.display = 'none';
+    lens.style.position = 'absolute';
+    lens.style.width = '100px';
+    lens.style.height = '100px';
+    lens.style.border = '2px solid #fff';
+    lens.style.borderRadius = '50%';
+    lens.style.pointerEvents = 'none';
+    lens.style.backgroundImage = `url(${image.src})`;
+    lens.style.backgroundRepeat = 'no-repeat';
+    lens.style.backgroundSize = `${container.offsetWidth * 2}px ${container.offsetHeight * 2}px`; // 2x zoom
 
-        container.addEventListener('mouseleave', () => {
-            lens.style.display = 'none';
-            container.querySelector('.zoom-indicator')?.classList.remove('active');
-            isZooming = false;
-        });
+    // Mostrar/ocultar lente
+    container.addEventListener('mouseenter', () => {
+        lens.style.display = 'block';
+        container.querySelector('.zoom-indicator')?.classList.add('active');
+    });
 
-        // Mover el lens con el mouse
-        container.addEventListener('mousemove', (e) => {
-            if (!isZooming) {
-                isZooming = true;
-            }
+    container.addEventListener('mouseleave', () => {
+        lens.style.display = 'none';
+        container.querySelector('.zoom-indicator')?.classList.remove('active');
+    });
 
-            const rect = container.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
+    // Movimiento del lente
+    container.addEventListener('mousemove', (e) => {
+        const rect = container.getBoundingClientRect();
+        let x = e.clientX - rect.left;
+        let y = e.clientY - rect.top;
 
-            // Calcular posición del lens (centrado en el cursor)
-            const lensSize = 100; // Tamaño del lens
-            let lensX = x - lensSize / 2;
-            let lensY = y - lensSize / 2;
+        const lensSize = 100;
+        const bgSize = 2; // 2x zoom
 
-            // Limitar el lens dentro del contenedor
-            lensX = Math.max(0, Math.min(lensX, container.offsetWidth - lensSize));
-            lensY = Math.max(0, Math.min(lensY, container.offsetHeight - lensSize));
+        // Limitar lente dentro del contenedor
+        const lensX = Math.max(0, Math.min(x - lensSize / 2, container.offsetWidth - lensSize));
+        const lensY = Math.max(0, Math.min(y - lensSize / 2, container.offsetHeight - lensSize));
 
-            // Posicionar el lens
-            lens.style.left = lensX + 'px';
-            lens.style.top = lensY + 'px';
+        lens.style.left = lensX + 'px';
+        lens.style.top = lensY + 'px';
 
-            // Calcular la posición de la imagen de fondo para simular zoom
-            const bgX = -(lensX * 2);
-            const bgY = -(lensY * 2);
-            
-            lens.style.backgroundImage = `url(${image.src})`;
-            lens.style.backgroundPosition = `${bgX}px ${bgY}px`;
-            lens.style.backgroundSize = `${container.offsetWidth * 2}px ${container.offsetHeight * 2}px`;
-        });
+        // Mover fondo en proporción inversa
+        const bgX = -lensX * bgSize;
+        const bgY = -lensY * bgSize;
+        lens.style.backgroundPosition = `${bgX}px ${bgY}px`;
+    });
 
-        // Touch events para móviles
-        container.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            lens.style.display = 'block';
-            container.querySelector('.zoom-indicator')?.classList.add('active');
-        });
+    // Soporte táctil
+    container.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        lens.style.display = 'block';
+        container.querySelector('.zoom-indicator')?.classList.add('active');
+    });
 
-        container.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-            const touch = e.touches[0];
-            const rect = container.getBoundingClientRect();
-            const x = touch.clientX - rect.left;
-            const y = touch.clientY - rect.top;
+    container.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const rect = container.getBoundingClientRect();
+        let x = touch.clientX - rect.left;
+        let y = touch.clientY - rect.top;
 
-            const lensSize = 100;
-            let lensX = x - lensSize / 2;
-            let lensY = y - lensSize / 2;
+        const lensSize = 100;
+        const bgSize = 2;
 
-            lensX = Math.max(0, Math.min(lensX, container.offsetWidth - lensSize));
-            lensY = Math.max(0, Math.min(lensY, container.offsetHeight - lensSize));
+        const lensX = Math.max(0, Math.min(x - lensSize / 2, container.offsetWidth - lensSize));
+        const lensY = Math.max(0, Math.min(y - lensSize / 2, container.offsetHeight - lensSize));
 
-            lens.style.left = lensX + 'px';
-            lens.style.top = lensY + 'px';
+        lens.style.left = lensX + 'px';
+        lens.style.top = lensY + 'px';
 
-            const bgX = -(lensX * 2);
-            const bgY = -(lensY * 2);
-            
-            lens.style.backgroundImage = `url(${image.src})`;
-            lens.style.backgroundPosition = `${bgX}px ${bgY}px`;
-            lens.style.backgroundSize = `${container.offsetWidth * 2}px ${container.offsetHeight * 2}px`;
-        });
+        const bgX = -lensX * bgSize;
+        const bgY = -lensY * bgSize;
+        lens.style.backgroundPosition = `${bgX}px ${bgY}px`;
+    });
 
-        container.addEventListener('touchend', () => {
-            lens.style.display = 'none';
-            container.querySelector('.zoom-indicator')?.classList.remove('active');
-        });
-    }
+    container.addEventListener('touchend', () => {
+        lens.style.display = 'none';
+        container.querySelector('.zoom-indicator')?.classList.remove('active');
+    });
+}
 };
 
 // ========== GESTIÓN DE PRODUCTOS ==========
@@ -1511,7 +1510,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ProductManager.init();
         PerformanceOptimizer.init();
         
-        console.log('✅ Aplicación inicializada correctamente');
+        console.log('✅');
         
         
     } catch (error) {
