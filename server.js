@@ -403,27 +403,7 @@ app.get('/confirmacion', requireAuth, async (req, res) => {
         }
         
         // Aquí podrías renderizar una página de confirmación
-        // Por ahora, devolvemos JSON o redirigimos al inicio con mensaje
-        res.send(`
-            <html>
-                <head><title>Pedido Confirmado</title></head>
-                <body style="font-family: Arial; text-align: center; padding: 50px;">
-                    <h1>¡Pedido Confirmado!</h1>
-                    <h2>Pedido #${pedidoId}</h2>
-                    <p><strong>Cliente:</strong> ${pedidoInfo[0].cliente_nombre}</p>
-                    <p><strong>Total:</strong> ${pedidoInfo[0].monto_total} MXN</p>
-                    <p><strong>Estado:</strong> ${pedidoInfo[0].estado}</p>
-                    <p><strong>Productos:</strong></p>
-                    <div style="text-align: left; max-width: 500px; margin: 0 auto;">
-                        ${pedidoInfo[0].productos_detalle}
-                    </div>
-                    <br>
-                    <a href="/" style="background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
-                        Volver al Inicio
-                    </a>
-                </body>
-            </html>
-        `);
+        res.sendFile(path.join(__dirname, 'views', 'confirmacion_pago.html'));
         
     } catch (error) {
         console.error('Error obteniendo información del pedido:', error);
@@ -468,7 +448,45 @@ app.get('/api/pedidos/historial', requireAuth, async (req, res) => {
         });
     }
 });
+//Ruta para traer los pedidos por el ID del cliente
+app.get('/api/pedidos/:id', requireAuth, async (req, res) => {
+    const pedidoId = req.params.id;
+    const clienteId = req.session.userId;
 
+    try {
+        const [pedido] = await pool.execute(`
+            SELECT 
+                p.id,
+                p.monto_total,
+                p.estado,
+                p.fecha_pedido,
+                c.nombre AS cliente_nombre,
+                c.correo_electronico
+            FROM pedidos p
+            INNER JOIN clientes c ON p.cliente_id = c.id
+            WHERE p.id = ? AND p.cliente_id = ?
+        `, [pedidoId, clienteId]);
+
+        if (pedido.length === 0) return res.status(404).json({ success: false });
+
+        const [items] = await pool.execute(`
+            SELECT 
+                ip.cantidad,
+                ip.talla,
+                pr.nombre,
+                ip.precio_compra
+            FROM items_pedido ip
+            INNER JOIN productos pr ON ip.producto_id = pr.id
+            WHERE ip.pedido_id = ?
+        `, [pedidoId]);
+
+        res.json({ success: true, pedido: pedido[0], items });
+
+    } catch (error) {
+        console.error('Error al obtener pedido:', error);
+        res.status(500).json({ success: false });
+    }
+});
 // -----------------------------------------------------------------------------
 // | Rutas para productos                                                      |
 // -----------------------------------------------------------------------------
@@ -697,6 +715,15 @@ app.get('/api/productos/falsificaciones/mas-baratas', async (req, res) => {
     }
 });
 
+// Sirve la página de confirmación
+app.get('/confirmacion_pago.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'confirmacion_pago.html'));
+});
+
+// Servir archivo de restablecimiento de contraseña
+app.get('/reset_password.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'reset_password.html'));
+});
 
 // -----------------------------------------------------------------------------
 // |  PayPal Configuracion                                                  |
@@ -743,6 +770,65 @@ app.post('/api/paypal/create-order', requireAuth, async (req, res) => {
     } catch (error) {
         console.error('Error al crear orden PayPal:', error);
         res.status(500).json({ success: false, message: 'Error al crear orden.' });
+    }
+});
+
+// Crear pedido en BD después del pago
+app.post('/api/crear-pedido', requireAuth, async (req, res) => {
+    const clienteId = req.session.userId;
+    const { items, montoTotal } = req.body;
+
+    if (!items || !Array.isArray(items) || items.length === 0) {
+        return res.status(400).json({ success: false, message: 'No hay productos' });
+    }
+
+    const connection = await pool.getConnection();
+    await connection.beginTransaction();
+
+    try {
+        // 1. Crear pedido
+        const [pedidoResult] = await connection.execute(
+            `INSERT INTO pedidos (cliente_id, monto_total, estado, fecha_pedido, creado_en, actualizado_en)
+             VALUES (?, ?, 'entregado', NOW(), NOW(), NOW())`,
+            [clienteId, montoTotal]
+        );
+
+        const pedidoId = pedidoResult.insertId;
+
+        // 2. Crear items del pedido
+        for (const item of items) {
+            if (!item.size || !item.price || !item.id) {
+                throw new Error('Faltan datos en el item');
+            }
+
+            // ✅ Buscar ID real del producto por su código
+            const [producto] = await connection.execute(
+                'SELECT id FROM productos WHERE codigo = ?',
+                [item.id.split('_')[0]]
+            );
+
+            if (producto.length === 0) {
+                throw new Error(`Producto con código ${item.id.split('_')[0]} no encontrado`);
+            }
+
+            const productoId = producto[0].id;
+
+            await connection.execute(
+                `INSERT INTO items_pedido (pedido_id, producto_id, cantidad, talla, precio_compra, creado_en, actualizado_en)
+                VALUES (?, ?, ?, ?, ?, NOW(), NOW())`,
+                [pedidoId, productoId, item.quantity, item.size, item.price]
+            );
+        }
+
+        await connection.commit();
+        res.json({ success: true, pedidoId });
+
+    } catch (error) {
+        await connection.rollback();
+        console.error('❌ Error al crear pedido:', error);
+        res.status(500).json({ success: false, message: error.message });
+    } finally {
+        connection.release();
     }
 });
 
@@ -834,7 +920,7 @@ app.post('/api/auth/forgot-password', async (req, res) => {
         );
         
         // 4. Enviar email con el enlace de recuperación
-        const resetUrl = `http://localhost:3000/views/reset_password.html?token=${resetToken}`;
+        const resetUrl = `http://localhost:3000/reset_password.html?token=${resetToken}`;
         await sendPasswordResetEmail(email, resetUrl);
 
         console.log('--- Token de Recuperación Generado ---');
@@ -850,6 +936,57 @@ app.post('/api/auth/forgot-password', async (req, res) => {
         
     } catch (error) {
         console.error('Error en forgot-password:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Error interno del servidor' 
+        });
+    }
+});
+
+// RESETEA EL PASSOWRD
+app.post('/api/auth/reset-password', async (req, res) => {
+    const { token, newPassword } = req.body;
+    
+    // Validar que el token y la nueva contraseña estén presentes
+    if (!token || !newPassword) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Token y nueva contraseña son requeridos' 
+        });
+    }
+
+    try {
+        // 1. Verificar si el token existe y no ha expirado
+        const [users] = await pool.execute(
+            'SELECT id, correo_electronico FROM clientes WHERE resetPasswordToken = ? AND resetPasswordExpires > NOW()',
+            [token]
+        );
+
+        if (users.length === 0) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'El token es inválido o ha expirado' 
+            });
+        }
+
+        const user = users[0];
+        
+        // 2. Hashear la nueva contraseña (deberías usar bcrypt)
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        
+        // 3. Actualizar la contraseña y limpiar el token
+        await pool.execute(
+            'UPDATE clientes SET password_hash = ?, resetPasswordToken = NULL, resetPasswordExpires = NULL WHERE id = ?',
+            [hashedPassword, user.id]
+        );
+        
+        res.status(200).json({ 
+            success: true, 
+            message: 'Contraseña actualizada exitosamente' 
+        });
+        
+    } catch (error) {
+        console.error('Error en reset-password:', error);
         res.status(500).json({ 
             success: false, 
             message: 'Error interno del servidor' 

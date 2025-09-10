@@ -1372,21 +1372,48 @@ const PayPalManager = {
                 if (!response.ok || !data.success) throw new Error(data.message || 'Error al crear orden');
                 return data.orderID;
             },
+
             onApprove: async (data) => {
-                const response = await fetch('/api/paypal/capture-order', {
+                // 1. Capturar el pago
+                const captureResponse = await fetch('/api/paypal/capture-order', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'include',
                     body: JSON.stringify({ orderID: data.orderID })
                 });
 
-                const result = await response.json();
-                if (response.ok && result.success) {
-                    onSuccess(result);
-                } else {
-                    onError(result.message || 'Error al capturar pago');
+                const captureResult = await captureResponse.json();
+
+                if (!captureResponse.ok || !captureResult.success) {
+                    onError(captureResult.message || 'Error al capturar pago');
+                    return;
                 }
+
+                // 2. Crear pedido en BD
+                const crearPedidoResponse = await fetch('/api/crear-pedido', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        items: cartItems,
+                        montoTotal: cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
+                    })
+                });
+
+                const pedidoData = await crearPedidoResponse.json();
+
+                if (!crearPedidoResponse.ok || !pedidoData.success) {
+                    NotificationManager.showError('Error al crear pedido en base de datos');
+                    return;
+                }
+
+                // 3. Todo OK → redirigir
+                NotificationManager.showSuccess('✅ Pago realizado con éxito');
+                CartManager.closeCart();
+                const customerName = encodeURIComponent(currentUser?.name || 'Cliente');
+                window.location.href = `/confirmacion_pago.html?pedido=${pedidoData.pedidoId}&nombre=${customerName}`;
             },
+
             onError: (err) => {
                 console.error('Error en PayPal:', err);
                 onError('Error al procesar el pago');
@@ -1394,7 +1421,6 @@ const PayPalManager = {
         }).render(containerId);
     }
 };
-
 
 // ========== OPTIMIZACIONES DE RENDIMIENTO ==========
 const PerformanceOptimizer = {

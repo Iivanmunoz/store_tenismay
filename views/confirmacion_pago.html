@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pedido Confirmado - TENIS MAFIA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #00a650;
+      --dark: #111;
+      --light: #f9f9f9;
+      --gray: #666;
+      --border: #e0e0e0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: var(--light);
+      color: var(--dark);
+      padding: 2rem 1rem;
+    }
+    .ticket {
+      max-width: 600px;
+      margin: auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 8px 25px rgba(0,0,0,.1);
+      overflow: hidden;
+    }
+    .header {
+      background: var(--primary);
+      color: #fff;
+      padding: 2rem;
+      text-align: center;
+    }
+    .header h1 {
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+    }
+    .body { padding: 2rem; }
+    .section { margin-bottom: 1.5rem; }
+    .section h2 {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      color: var(--primary);
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.25rem;
+    }
+    .items { border-top: 1px solid var(--border); padding-top: 1rem; }
+    .item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+    .item .info { flex: 1; }
+    .item .info .name { font-weight: 600; }
+    .item .info .qty { font-size: 0.85rem; color: var(--gray); }
+    .total {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-align: right;
+      margin-top: 1rem;
+    }
+    .footer {
+      background: var(--light);
+      padding: 1.5rem 2rem;
+      font-size: 0.9rem;
+      color: var(--gray);
+      text-align: center;
+    }
+    .btn {
+      display: inline-block;
+      margin-top: 1.5rem;
+      background: var(--primary);
+      color: #fff;
+      padding: 0.75rem 1.5rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background 0.3s ease;
+    }
+    .btn:hover { background: #008c44; }
+    @media (max-width: 480px) {
+      body { padding: 1rem 0.5rem; }
+      .header h1 { font-size: 1.5rem; }
+      .body, .footer { padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="ticket">
+    <div class="header">
+      <h1>✅ Compra Exitosa</h1>
+      <p>Gracias por tu pedido, <span id="customerName">Cliente</span></p>
+    </div>
+    <div class="body">
+      <div class="section">
+        <h2>Información del Pedido</h2>
+        <div class="row"><span><strong>Número de Orden:</strong></span><span id="orderNumber">#000000</span></div>
+        <div class="row"><span><strong>Fecha:</strong></span><span id="orderDate">--/--/----</span></div>
+        <div class="row"><span><strong>Correo:</strong></span><span id="customerEmail">correo@ejemplo.com</span></div>
+      </div>
+      <div class="section items">
+        <h2>Productos</h2>
+        <div id="orderItems"></div>
+        <div class="total" id="orderTotal">$0.00 MXN</div>
+      </div>
+    </div>
+    <div class="footer">
+      TENIS MAFIA - Hecho con ❤️ en México<br>
+      ¿Dudas? Escríbenos a: soporte@tenismafia.com
+    </div>
+    <a href="/" class="btn">Volver a la Tienda</a>
+  </div>
+
+  <script>
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const nombre = urlParams.get('nombre');
+    if (nombre) {
+        document.getElementById('customerName').textContent = decodeURIComponent(nombre);
+    }
+    // Utils para formateo
+    const Utils = {
+      formatPrice(price) {
+        return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(price);
+      }
+    };
+
+    async function cargarPedidoDesdeBD() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const pedidoId = urlParams.get('pedido');
+
+      if (!pedidoId) return;
+
+      try {
+        const response = await fetch(`/api/pedidos/${pedidoId}`, { credentials: 'include' });
+        const data = await response.json();
+
+        if (!data.success) throw new Error(data.message);
+
+        const { pedido, items } = data;
+
+        document.getElementById('customerName').textContent = pedido.cliente_nombre;
+        document.getElementById('customerEmail').textContent = pedido.correo_electronico;
+        document.getElementById('orderNumber').textContent = `#${pedido.id}`;
+        document.getElementById('orderDate').textContent = new Date(pedido.fecha_pedido).toLocaleDateString('es-MX');
+
+        const itemsContainer = document.getElementById('orderItems');
+        itemsContainer.innerHTML = '';
+        items.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'item';
+          div.innerHTML = `
+            <div class="info">
+              <div class="name">${item.nombre}</div>
+              <div class="qty">Talla: ${item.talla} × ${item.cantidad}</div>
+            </div>
+            <div class="price">${Utils.formatPrice(item.precio_compra * item.cantidad)}</div>
+          `;
+          itemsContainer.appendChild(div);
+        });
+
+        const total = items.reduce((sum, item) => sum + (item.precio_compra * item.cantidad), 0);
+        document.getElementById('orderTotal').textContent = Utils.formatPrice(total);
+
+      } catch (error) {
+        console.error('Error al cargar pedido:', error);
+        document.body.innerHTML = '<p style="text-align:center; padding:2rem;">Error al cargar los datos del pedido.</p>';
+      }
+    }
+
+    cargarPedidoDesdeBD();
+  </script>
+</body>
+</html>
