@@ -75,7 +75,7 @@ const Utils = {
     }
 };
 
-// ========== GESTIÓN DEL CARRITO MEJORADA ==========
+// ========== GESTIÓN DEL CARRITO  ==========
 const CartManager = {
     // Inicializar carrito
     init() {
@@ -85,7 +85,7 @@ const CartManager = {
         this.updateDisplay();
     },
 
-    // Cachear elementos del DOM - CORREGIDO
+    // Cachear elementos del DOM 
     cacheElements() {
         DOM_CACHE.cartOverlay = document.getElementById('cartOverlay');
         DOM_CACHE.cartClose = document.getElementById('cartClose');
@@ -96,9 +96,10 @@ const CartManager = {
         DOM_CACHE.clearCartBtn = document.getElementById('clearCart');
         DOM_CACHE.cartToggle = document.querySelector('.cart-toggle');
         DOM_CACHE.cartActions = document.querySelector('.cart-actions');
+        DOM_CACHE.authCloseBtn = document.getElementById('authCloseBtn');
     },
 
-    // Actualizar contenido del carrito - CORREGIDO
+    // Actualizar contenido del carrito
     updateCartContent() {
         if (!DOM_CACHE.cartItems || !DOM_CACHE.cartEmpty) return;
 
@@ -124,14 +125,14 @@ const CartManager = {
 
     },
 
-    // Alternar acciones del carrito - CORREGIDO
+    // Alternar acciones del carrito 
     toggleCartActions(show) {
         if (DOM_CACHE.cartActions) {
             DOM_CACHE.cartActions.style.display = show ? 'flex' : 'none';
         }
     },
 
-    // Actualizar display del carrito - CORREGIDO
+    // Actualizar display del carrito 
     updateDisplay() {
         this.updateCounter();
         this.updateCartContent();
@@ -139,7 +140,7 @@ const CartManager = {
         
        
     },
-    // Mantener el resto de métodos igual...
+    
     bindEvents() {
         // Abrir carrito
         if (DOM_CACHE.cartToggle) {
@@ -162,7 +163,6 @@ const CartManager = {
                 }
             });
         }
-
         // Cerrar con ESC
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && DOM_CACHE.cartOverlay?.classList.contains('active')) {
@@ -177,7 +177,36 @@ const CartManager = {
 
         // Guardar carrito antes de cerrar página
         window.addEventListener('beforeunload', () => this.saveToStorage());
+
+        // ==== CIERRE UNIVERSAL DE MODALES ====
+        // Botón X del modal auth
+        const authCloseBtn = document.getElementById('authCloseBtn');
+        if (authCloseBtn) {
+            authCloseBtn.addEventListener('click', () => {
+                document.getElementById('authModal')?.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+        }
+
+        // Cerrar #premiumAlert (click fuera o ESC)
+        const premiumAlert = document.getElementById('premiumAlert');
+        if (premiumAlert) {
+            // Click en el backdrop
+            premiumAlert.addEventListener('click', e => {
+                if (e.target === premiumAlert) {
+                    premiumAlert.classList.remove('active');
+                }
+            });
+            // ESC
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Escape') {
+                    premiumAlert.classList.remove('active');
+                }
+            });
+        }
     },
+
+    
     // Abrir carrito
     openCart() {
         if (DOM_CACHE.cartOverlay) {
@@ -398,7 +427,6 @@ const CartManager = {
             }
         );
     }
-
     
 };
 
@@ -495,14 +523,14 @@ const AuthManager = {
         // Abrir modal de auth
         DOM_CACHE.userIcon?.addEventListener('click', () => {
             if (!currentUser && DOM_CACHE.authModal) {
-                DOM_CACHE.authModal.style.display = 'flex';
+                document.getElementById('authModal').classList.add('active');
             }
         });
 
         // Cerrar modales con click fuera
         window.addEventListener('click', (e) => {
-            if (e.target === DOM_CACHE.authModal) {
-                DOM_CACHE.authModal.style.display = 'none';
+            if (e.target.id === 'authBackdrop') {
+                document.getElementById('authModal').classList.remove('active');
             }
             if (e.target === DOM_CACHE.passwordRecoveryModal) {
                 DOM_CACHE.passwordRecoveryModal.style.display = 'none';
@@ -521,15 +549,15 @@ const AuthManager = {
             }
         });
 
-        // Tabs de autenticación
-        document.querySelectorAll('.auth-tab').forEach(tab => {
+        //Tabs premium
+        document.querySelectorAll('.auth-tab-premium').forEach(tab => {
             tab.addEventListener('click', () => {
                 this.switchTab(tab.dataset.tab);
             });
         });
 
-        // Enlaces de cambio de formulario
-        document.querySelectorAll('.switch-tab').forEach(link => {
+        // Enlaces premium
+        document.querySelectorAll('.switch-tab-premium').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
                 this.switchTab(link.dataset.tab);
@@ -564,7 +592,7 @@ const AuthManager = {
                 
                 // Abrir modal de autenticación y cambiar al tab correcto
                 if (DOM_CACHE.authModal) {
-                    DOM_CACHE.authModal.style.display = 'flex';
+                        document.getElementById('authModal').classList.add('active');
                     this.switchTab(tabName);
                 }
             });
@@ -576,7 +604,7 @@ const AuthManager = {
         // Botón de login en alerta premium
         document.getElementById('loginBtn')?.addEventListener('click', () => {
             document.getElementById('premiumAlert')?.classList.remove('active');
-            DOM_CACHE.authModal.style.display = 'flex';
+                document.getElementById('authModal').classList.add('active');
         });
     },
 
@@ -612,6 +640,7 @@ const AuthManager = {
                 this.updateUserUI();
                 DOM_CACHE.authModal.style.display = 'none';
                 NotificationManager.showSuccess('¡Bienvenido de vuelta!');
+                location.reload();
             } else {
                 NotificationManager.showError(data.message);
             }
@@ -628,6 +657,15 @@ const AuthManager = {
         const email = document.getElementById('register-email').value;
         const password = document.getElementById('register-password').value;
         const confirmPassword = document.getElementById('register-confirm').value;
+        const telefono = document.getElementById('register-telefono').value;
+        const direccion = document.getElementById('register-direccion').value;
+        const colonia = document.getElementById('register-colonia').value;
+        const codigoPostal = document.getElementById('register-codigo-postal').value;
+        const ciudad = document.getElementById('register-ciudad').value;
+        const fechaNacimiento = document.getElementById('register-fecha-nacimiento').value;
+        const genero = document.getElementById('register-genero').value;
+        const preferenciaMarca = document.getElementById('register-preferencia-marca').value;
+        const puntoEntrega = document.getElementById('register-punto-entrega').value;
 
         if (password !== confirmPassword) {
             NotificationManager.showError('Las contraseñas no coinciden');
@@ -638,7 +676,21 @@ const AuthManager = {
             const response = await fetch('/registernew', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nombre, email, password, confirmPassword })
+                body: JSON.stringify({
+                    nombre,
+                    email,
+                    password,
+                    confirmPassword,
+                    telefono,
+                    direccion,
+                    colonia,
+                    codigoPostal,
+                    ciudad,
+                    fechaNacimiento,
+                    genero,
+                    preferenciaMarca,
+                    puntoEntrega
+                })
             });
 
             if (!response.ok) {
@@ -716,8 +768,8 @@ const AuthManager = {
     },
 
     switchTab(tabType) {
-        const authTabs = document.querySelectorAll('.auth-tab');
-        const authForms = document.querySelectorAll('.auth-form');
+        const authTabs = document.querySelectorAll('.auth-tab-premium');
+        const authForms = document.querySelectorAll('.auth-form-premium');
         
         authTabs.forEach(tab => {
             tab.classList.toggle('active', tab.dataset.tab === tabType);
@@ -736,7 +788,19 @@ const AuthManager = {
         if (authHeader) {
             authHeader.textContent = tabType === 'login' ? 'Iniciar Sesión' : 'Registrarse';
         }
+        // Animar entrada del formulario
+        const activeForm = document.querySelector('.auth-form-premium.active');
+        if (activeForm) {
+            activeForm.style.opacity = '0';
+            activeForm.style.transform = 'translateY(10px)';
+            setTimeout(() => {
+                activeForm.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                activeForm.style.opacity = '1';
+                activeForm.style.transform = 'translateY(0)';
+            }, 50);
+        }
     },
+    
 
     logout() {
         currentUser = null;
@@ -1063,8 +1127,8 @@ const ProductManager = {
                 </div>
                 
                 <div class="product-features">
-                    <span class="feature-tag material">🔥 Material premium</span>
-                    <span class="feature-tag boost">👟 Plantilla Boost</span>
+                    <span class="feature-tag material">🔥 Materiales de Calidad</span>
+                    <span class="feature-tag boost">👟 Imagenes Reales</span>
                 </div>
 
                 <div class="rating">
@@ -1093,7 +1157,7 @@ const ProductManager = {
             <div class="delivery-info">
                 <span class="delivery-icon">🚚</span>
                 <div class="delivery-text">
-                    <span>Entrega: Miércoles y Sábado</span>
+                    <span>Entregas: Miercoles y Sabado</span>
                 </div>
             </div>
         `;

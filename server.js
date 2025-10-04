@@ -121,8 +121,7 @@ app.use(express.json({ limit: '10mb' }));
 
 // Ruta para registrar usuario nuevo
 app.post('/registernew', async (req, res) => {
-    const { nombre, email, password, confirmPassword } = req.body;
-
+    const { nombre, email, telefono, password, confirmPassword, direccion, colonia, codigoPostal, ciudad, estado, fechaNacimiento, genero, preferenciaMarca } = req.body;
     // Validaciones
     if (!nombre || !email || !password || !confirmPassword) {
         return res.status(400).json({ success: false, message: 'Todos los campos son obligatorios.' });
@@ -158,18 +157,24 @@ app.post('/registernew', async (req, res) => {
 
         // Insertar nuevo usuario
         const query = `
-            INSERT INTO clientes (
-                nombre, 
-                correo_electronico, 
-                password_hash,
-                gasto_total,
-                creado_en,
-                actualizado_en
-            ) 
-            VALUES (?, ?, ?, 0.00, NOW(), NOW())
+            INSERT INTO clientes (nombre, correo_electronico,telefono, password_hash, direccion, colonia, codigo_postal, ciudad, estado, fecha_nacimiento, genero, preferencia_marca, gasto_total, creado_en, actualizado_en)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0.00, NOW(), NOW())
         `;
 
-        const [result] = await pool.execute(query, [nombre, email, hashedPassword]);
+        const [result] = await pool.execute(query, [
+            nombre,
+            email,
+            telefono, // telefono
+            hashedPassword,
+            direccion || null,
+            colonia || null,
+            codigoPostal || null,
+            ciudad || null,
+            estado || null,
+            fechaNacimiento || null,
+            genero || null,
+            preferenciaMarca || null
+        ]);
         console.log('--- Usuario Nuevo Registrado ---');
         console.log(`ID: ${result.insertId}`);
         console.log(`Nombre: ${nombre}`);

@@ -144,6 +144,10 @@ body {
             animation-delay: 0.6s;
             color: #002d00;
         }
+        .nav-links li:nth-child(5) a {
+            animation-delay: 0.6s;
+            color: #002d00;
+        }
         
         /* Efecto de subrayado al pasar el mouse */
         .nav-links li a::after {
@@ -2675,3 +2679,612 @@ body {
                 margin-top: 10px;
             }
         }
+
+/*MODAL PREMIUM REHECHO */
+.auth-modal-premium {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.auth-modal-premium.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.auth-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(13, 43, 79, 0.7);
+  backdrop-filter: blur(6px);
+}
+
+.auth-dialog {
+  position: relative;
+  background: var(--secondary-color);
+  border-radius: 24px;
+  width: 90%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+  transform: scale(0.95);
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.auth-modal-premium.active .auth-dialog {
+  transform: scale(1);
+}
+
+.auth-header-premium {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 28px 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.auth-title {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--primary-color);
+  letter-spacing: 0.5px;
+}
+
+.auth-close-btn {
+  background: none;
+  border: none;
+  font-size: 1.6rem;
+  color: var(--primary-color);
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.auth-close-btn:hover {
+  color: var(--accent-color);
+}
+
+/* Tabs */
+.auth-tabs-premium {
+  display: flex;
+  padding: 0 28px;
+  gap: 8px;
+}
+
+.auth-tab-premium {
+  flex: 1;
+  padding: 10px 0;
+  border: none;
+  background: transparent;
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--primary-color);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.auth-tab-premium.active {
+  color: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+/* Body */
+.auth-body-premium {
+  padding: 28px;
+}
+
+.auth-form-premium {
+  display: none;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.auth-form-premium.active {
+  display: flex;
+}
+
+/* Inputs */
+.form-row input,
+.form-row select {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  font-size: 1rem;
+  background: #ffffff;
+  color: var(--text-color);
+  transition: all 0.3s ease;
+  font-family: var(--font-primary);
+}
+
+.form-row input:focus,
+.form-row select:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(196, 162, 103, 0.2);
+  outline: none;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+
+@media (min-width: 600px) {
+  .form-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Opciones */
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.form-options a {
+  color: var(--accent-color);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+/* Botón */
+.auth-submit-btn {
+  margin-top: 10px;
+  padding: 16px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--accent-color), #b8934f);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.auth-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(196, 162, 103, 0.4);
+}
+
+/* Footer */
+.auth-footer-premium {
+  padding: 20px 28px;
+  text-align: center;
+  font-size: 0.95rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.auth-footer-premium a {
+  color: var(--accent-color);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* ✅ ESTILOS EXCLUSIVOS PARA FORMULARIO DE REGISTRO - PREMIUM */
+#registerForm .form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+@media (min-width: 600px) {
+  #registerForm .form-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ✅ Inputs y selects del registro IGUALES al login */
+#registerForm input,
+#registerForm select {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  font-size: 1rem;
+  background: #ffffff;
+  color: var(--text-color);
+  transition: all 0.3s ease;
+  font-family: var(--font-primary);
+}
+
+#registerForm input:focus,
+#registerForm select:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(196, 162, 103, 0.2);
+  outline: none;
+}
+
+/* ✅ Selects con flecha dorada */
+#registerForm select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23C4A267' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 16px;
+}
+
+/* ✅ Botón de registro IGUAL al de login */
+#registerForm .auth-submit-btn {
+  margin-top: 10px;
+  padding: 16px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--accent-color), #b8934f);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#registerForm .auth-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(196, 162, 103, 0.4);
+}
+
+/* ✅ Animación suave al cambiar de tab */
+#registerForm {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+#registerForm.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ✅ ICONOS DENTRO DE INPUTS - REGISTRO ULTRA PREMIUM */
+#registerForm .form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 600px) {
+  #registerForm .form-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ✅ Contenedor con icono */
+#registerForm .input-icon-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+#registerForm .input-icon {
+  position: absolute;
+  left: 16px;
+  color: var(--accent-color);
+  font-size: 1.1rem;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+/* ✅ Input con espacio para icono */
+#registerForm input,
+#registerForm select {
+  width: 100%;
+  padding: 14px 16px 14px 48px; /* espacio para icono */
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  font-size: 1rem;
+  background: #ffffff;
+  color: var(--text-color);
+  transition: all 0.3s ease;
+  font-family: var(--font-primary);
+}
+
+#registerForm input:focus,
+#registerForm select:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(196, 162, 103, 0.2);
+  outline: none;
+}
+
+/* ✅ Animación de icono al foco */
+#registerForm input:focus ~ .input-icon,
+#registerForm select:focus ~ .input-icon {
+  color: var(--accent-dynamic);
+  transform: scale(1.1);
+}
+
+/* ✅ Select con flecha dorada */
+#registerForm select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23C4A267' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 16px;
+}
+
+/* ✅ Botón IGUAL al login */
+#registerForm .auth-submit-btn {
+  margin-top: 10px;
+  padding: 16px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--accent-color), #b8934f);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#registerForm .auth-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(196, 162, 103, 0.4);
+}
+
+/* ✅ Animación suave al cambiar de tab */
+#registerForm {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+#registerForm.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+/* ✅ ICONOS DENTRO DE INPUTS - REGISTRO ULTRA PREMIUM */
+#registerForm .form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 600px) {
+  #registerForm .form-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ✅ Contenedor con icono */
+#registerForm .input-icon-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+#registerForm .input-icon {
+  position: absolute;
+  left: 16px;
+  color: var(--accent-color);
+  font-size: 1.1rem;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+/* ✅ Input con espacio para icono */
+#registerForm input,
+#registerForm select {
+  width: 100%;
+  padding: 14px 16px 14px 48px; /* espacio para icono */
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  font-size: 1rem;
+  background: #ffffff;
+  color: var(--text-color);
+  transition: all 0.3s ease;
+  font-family: var(--font-primary);
+}
+
+#registerForm input:focus,
+#registerForm select:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(196, 162, 103, 0.2);
+  outline: none;
+}
+
+/* ✅ Animación de icono al foco */
+#registerForm input:focus ~ .input-icon,
+#registerForm select:focus ~ .input-icon {
+  color: var(--accent-dynamic);
+  transform: scale(1.1);
+}
+
+/* ✅ Select con flecha dorada */
+#registerForm select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23C4A267' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 16px;
+}
+
+/* ✅ Botón IGUAL al login */
+#registerForm .auth-submit-btn {
+  margin-top: 10px;
+  padding: 16px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--accent-color), #b8934f);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#registerForm .auth-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(196, 162, 103, 0.4);
+}
+
+/* ✅ Animación suave al cambiar de tab */
+#registerForm {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+#registerForm.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+.input-group {
+  position: relative;          /* contexto de posicionamiento */
+  width: 100%;                 /* para que ocupe todo el ancho de la celda */
+}
+
+.input-icon {
+  position: absolute;
+  left: 12px;                  /* separación desde la izquierda */
+  top: 50%;
+  transform: translateY(-50%); /* centra verticalmente */
+  color: #888;
+  pointer-events: none;        /* que no interfiera con el click */
+}
+
+/* deja espacio al texto del placeholder y al valor */
+.input-group input {
+  padding-left: 40px;          /* ancho del icono + separación */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+
+
+/* ----------  Sección ---------- */
+.paypal-tutorial-section{
+  padding:80px 20px;
+  background:linear-gradient(160deg,#f8f9fa 0%,#eef2f6 100%);
+  overflow:hidden;
+}
+.paypal-tutorial-section .section-title{
+  text-align:center;
+  font-size:clamp(2rem,4vw,3rem);
+  margin-bottom:12px;
+}
+.paypal-tutorial-section .section-title .paypal-logo{
+  color:#003087;
+  font-weight:700;
+}
+.paypal-tutorial-section .section-subtitle{
+  text-align:center;
+  font-size:1.1rem;
+  opacity:.8;
+  margin-bottom:50px;
+}
+
+/* ----------  Tarjetas ---------- */
+.tutorial-wrapper{
+  display:grid;
+  gap:30px;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  max-width:1200px;
+  margin:auto;
+}
+.tutorial-card{
+  background:#fff;
+  border-radius:16px;
+  box-shadow:0 8px 20px rgba(0,0,0,.06);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  transition:transform .3s, box-shadow .3s;
+}
+
+.tutorial-card {
+    cursor: pointer; /* Muestra una mano al pasar el cursor */
+    transition: all 0.2s ease; /* Suaviza los cambios de estilo */
+}
+
+.tutorial-card:hover {
+    /* Un efecto sutil al pasar el mouse, como un cambio de sombra o color de fondo */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    /* background-color: #f9f9f9; */
+}
+.card-media{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:40px 20px 20px;
+}
+.step-icon{
+  width:120px;
+  height:120px;
+  object-fit:contain;
+}
+.card-content{
+  padding:0 24px 30px;
+  position:relative;
+  text-align:center;
+}
+.card-number{
+  display:inline-block;
+  background:#0070e0;
+  color:#fff;
+  width:32px;height:32px;
+  border-radius:50%;
+  line-height:32px;
+  font-weight:700;
+  margin-bottom:10px;
+}
+.card-content h3{
+  margin:10px 0 8px;
+  font-size:1.25rem;
+}
+.card-content p{
+  font-size:.95rem;
+  opacity:.85;
+}
+
+/* ----------  Footer ---------- */
+.tutorial-footer{
+  text-align:center;
+  margin-top:50px;
+}
+.tutorial-footer p{
+  margin-bottom:15px;
+  font-size:1.1rem;
+}
+
+/* ----------  Animaciones ---------- */
+@keyframes fadeIn{
+  from{opacity:0}
+  to{opacity:1}
+}
+@keyframes slideUp{
+  from{opacity:0;transform:translateY(40px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.fade-in{animation:fadeIn 1s both}
+.slide-up{animation:slideUp .7s both}
+/* Retraso escalonado */
+.tutorial-card:nth-child(1){animation-delay:.1s}
+.tutorial-card:nth-child(2){animation-delay:.2s}
+.tutorial-card:nth-child(3){animation-delay:.3s}
+.tutorial-card:nth-child(4){animation-delay:.4s}
+
+/* ----------  Responsivo ---------- */
+@media(max-width:600px){
+  .paypal-tutorial-section{padding:60px 15px}
+  .tutorial-wrapper{gap:20px}
+  .step-icon{width:90px;height:90px}
+}
