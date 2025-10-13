@@ -8,7 +8,7 @@ return nodemailer.createTransport({
         secure: false, // true para puerto 465, false para otros puertos
         auth: {
             user: 'tennismay19@gmail.com',
-            pass: 'jnfx invt zejm wlrf'
+            pass: 'uwnn yaix pouv fqyz'
         },
         tls: {
             rejectUnauthorized: false // Para desarrollo local
