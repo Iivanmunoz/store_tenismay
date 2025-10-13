@@ -10,9 +10,6 @@ return nodemailer.createTransport({
             user: 'tennismay19@gmail.com',
             pass: 'uwnn yaix pouv fqyz'
         },
-        tls: {
-            rejectUnauthorized: false // Para desarrollo local
-        }
     });
 };
 
