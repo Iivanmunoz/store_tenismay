@@ -28,10 +28,10 @@ const PORT = process.env.PORT || 3000;
 // | Configuración de la Base de Datos MySQL                                   |
 // -----------------------------------------------------------------------------
 const dbConfig = {
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
+    host: mysql.railway.internal,
+    user: 'root',
+    password: 'KxvPCoTBQFFOBLACyubsEHxDIfTVqKPk',
+    database: 'railway',
     port: process.env.DB_PORT || 3306,
     waitForConnections: true,
     connectionLimit: 10,
