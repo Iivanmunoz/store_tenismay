@@ -28,7 +28,7 @@ const PORT = process.env.PORT || 3000;
 // | Configuración de la Base de Datos MySQL                                   |
 // -----------------------------------------------------------------------------
 const dbConfig = {
-    host: mysql.railway.internal,
+    host: 'mysql.railway.internal',
     user: 'root',
     password: 'KxvPCoTBQFFOBLACyubsEHxDIfTVqKPk',
     database: 'railway',
