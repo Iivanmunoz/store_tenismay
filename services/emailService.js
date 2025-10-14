@@ -20,7 +20,7 @@ const sendPasswordResetEmail = async (email, resetUrl) => {
     const mailOptions = {
         from: {
             name: 'TennisMay',
-            address: process.env.SMTP_FROM
+            address: 'tennismay19@gmail.com'
         },
         to: email,
         subject: 'Recuperación de Contraseña',
