@@ -1,30 +1,30 @@
 const nodemailer = require('nodemailer');
 
-// Crear transportador SMTP
+// Crear transportador SMTP usando variables de entorno
 const createTransporter = () => {
-return nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false, // true para puerto 465, false para otros puertos
-        auth: {
-            user: 'tennismay19@gmail.com',
-            pass: 'uwnn yaix pouv fqyz'
-        },
-    });
+  return nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT),
+    secure: process.env.SMTP_PORT === '465', // true solo si usas puerto 465
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
 };
 
 // Función para enviar email de recuperación
 const sendPasswordResetEmail = async (email, resetUrl) => {
-    const transporter = createTransporter();
-    
-    const mailOptions = {
-        from: {
-            name: 'TennisMay',
-            address: 'tennismay19@gmail.com'
-        },
-        to: email,
-        subject: 'Recuperación de Contraseña',
-        html: `
+  const transporter = createTransporter();
+
+  const mailOptions = {
+    from: {
+      name: 'TennisMay',
+      address: process.env.SMTP_FROM,
+    },
+    to: email,
+    subject: 'Recuperación de Contraseña',
+            html: `
             <!DOCTYPE html>
             <html>
             <head>
@@ -92,32 +92,32 @@ const sendPasswordResetEmail = async (email, resetUrl) => {
             </body>
             </html>
         `
-    };
-    
-    try {
-        const info = await transporter.sendMail(mailOptions);
-        console.log('Email enviado:', info.messageId);
-        return { success: true, messageId: info.messageId };
-    } catch (error) {
-        console.error('Error enviando email:', error);
-        throw error;
-    }
+  };
+
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log('✅ Email enviado:', info.messageId);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error('❌ Error enviando email:', error);
+    throw error;
+  }
 };
 
 // Función para verificar conexión SMTP
 const verifyConnection = async () => {
-    const transporter = createTransporter();
-    try {
-        await transporter.verify();
-        console.log('✅ Conexión SMTP verificada correctamente');
-        return true;
-    } catch (error) {
-        console.error('❌ Error en conexión SMTP:', error);
-        return false;
-    }
+  const transporter = createTransporter();
+  try {
+    await transporter.verify();
+    console.log('✅ Conexión SMTP verificada correctamente');
+    return true;
+  } catch (error) {
+    console.error('❌ Error en conexión SMTP:', error);
+    return false;
+  }
 };
 
 module.exports = {
-    sendPasswordResetEmail,
-    verifyConnection
+  sendPasswordResetEmail,
+  verifyConnection,
 };
