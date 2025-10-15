@@ -983,26 +983,26 @@ const ZoomManager = {
     });
 
     // Movimiento del lente
-    container.addEventListener('mousemove', (e) => {
-        const rect = container.getBoundingClientRect();
-        let x = e.clientX - rect.left;
-        let y = e.clientY - rect.top;
+    // container.addEventListener('mousemove', (e) => {
+    //     const rect = container.getBoundingClientRect();
+    //     let x = e.clientX - rect.left;
+    //     let y = e.clientY - rect.top;
 
-        const lensSize = 100;
-        const bgSize = 2; // 2x zoom
+    //     const lensSize = 100;
+    //     const bgSize = 2; // 2x zoom
 
-        // Limitar lente dentro del contenedor
-        const lensX = Math.max(0, Math.min(x - lensSize / 2, container.offsetWidth - lensSize));
-        const lensY = Math.max(0, Math.min(y - lensSize / 2, container.offsetHeight - lensSize));
+    //     // Limitar lente dentro del contenedor
+    //     const lensX = Math.max(0, Math.min(x - lensSize / 2, container.offsetWidth - lensSize));
+    //     const lensY = Math.max(0, Math.min(y - lensSize / 2, container.offsetHeight - lensSize));
 
-        lens.style.left = lensX + 'px';
-        lens.style.top = lensY + 'px';
+    //     lens.style.left = lensX + 'px';
+    //     lens.style.top = lensY + 'px';
 
-        // Mover fondo en proporción inversa
-        const bgX = -lensX * bgSize;
-        const bgY = -lensY * bgSize;
-        lens.style.backgroundPosition = `${bgX}px ${bgY}px`;
-    });
+    //     // Mover fondo en proporción inversa
+    //     const bgX = -lensX * bgSize;
+    //     const bgY = -lensY * bgSize;
+    //     lens.style.backgroundPosition = `${bgX}px ${bgY}px`;
+    // });
 
     // Soporte táctil
     container.addEventListener('touchstart', (e) => {
@@ -1011,26 +1011,50 @@ const ZoomManager = {
         container.querySelector('.zoom-indicator')?.classList.add('active');
     });
 
-    container.addEventListener('touchmove', (e) => {
-        e.preventDefault();
-        const touch = e.touches[0];
-        const rect = container.getBoundingClientRect();
-        let x = touch.clientX - rect.left;
-        let y = touch.clientY - rect.top;
+// ------ DENTRO DE initZoomForProduct, reemplaza los bloques touchmove ------
+// (y el mousemove si quieres el mismo efecto en escritorio)
 
-        const lensSize = 100;
-        const bgSize = 2;
+const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+const offsetX = isTouch ? -60 : 0;   // 60 px a la izquierda
+const offsetY = isTouch ? -60 : 0;   // 60 px hacia arriba
 
-        const lensX = Math.max(0, Math.min(x - lensSize / 2, container.offsetWidth - lensSize));
-        const lensY = Math.max(0, Math.min(y - lensSize / 2, container.offsetHeight - lensSize));
+// Mouse
+container.addEventListener('mousemove', (e) => {
+    const rect = container.getBoundingClientRect();
+    let x = e.clientX - rect.left + offsetX;  // <- aplicamos offset
+    let y = e.clientY - rect.top  + offsetY;
 
-        lens.style.left = lensX + 'px';
-        lens.style.top = lensY + 'px';
+    const lensSize = 100;
+    const bgSize   = 2;
 
-        const bgX = -lensX * bgSize;
-        const bgY = -lensY * bgSize;
-        lens.style.backgroundPosition = `${bgX}px ${bgY}px`;
-    });
+    const lensX = Math.max(0, Math.min(x - lensSize/2, container.offsetWidth  - lensSize));
+    const lensY = Math.max(0, Math.min(y - lensSize/2, container.offsetHeight - lensSize));
+
+    lens.style.left = lensX + 'px';
+    lens.style.top  = lensY + 'px';
+
+    lens.style.backgroundPosition = `${-lensX * bgSize}px ${-lensY * bgSize}px`;
+});
+
+// Touch
+container.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const rect  = container.getBoundingClientRect();
+    let x = touch.clientX - rect.left + offsetX;
+    let y = touch.clientY - rect.top  + offsetY;
+
+    const lensSize = 100;
+    const bgSize   = 2;
+
+    const lensX = Math.max(0, Math.min(x - lensSize/2, container.offsetWidth  - lensSize));
+    const lensY = Math.max(0, Math.min(y - lensSize/2, container.offsetHeight - lensSize));
+
+    lens.style.left = lensX + 'px';
+    lens.style.top  = lensY + 'px';
+
+    lens.style.backgroundPosition = `${-lensX * bgSize}px ${-lensY * bgSize}px`;
+});
 
     container.addEventListener('touchend', () => {
         lens.style.display = 'none';
