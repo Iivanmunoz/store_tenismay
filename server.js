@@ -324,7 +324,7 @@ app.post('/registrar', async (req, res) => {
     }
     
     try {
-        const query = 'INSERT INTO contactos (nombre, email, mensaje) VALUES (?, ?, ?)';
+        const query = 'INSERT INTO clientes (nombre, email, mensaje) VALUES (?, ?, ?)';
         const [result] = await pool.execute(query, [nombre, email, mensaje]);
         
         console.log('--- Contacto Guardado ---');
