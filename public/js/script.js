@@ -576,10 +576,12 @@ const AuthManager = {
         });
 
         // Enlace de contraseña olvidada
-        const forgotLink = document.querySelector('.forgot-password');
-        forgotLink?.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.showPasswordRecoveryModal();
+        document.addEventListener('click', (e) => {
+            if (e.target.matches('.forgot-password')) {
+                e.preventDefault();
+                e.stopPropagation(); 
+                this.showPasswordRecoveryModal();
+            }
         });
 
         // Enlaces "switch-tab" en el modal de recuperación

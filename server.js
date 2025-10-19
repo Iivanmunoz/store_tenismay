@@ -12,6 +12,7 @@ const bcrypt = require('bcrypt');
 const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
 const paypal = require('@paypal/checkout-server-sdk');
+app.use(express.static('public'));
 
 
 
