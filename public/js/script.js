@@ -580,7 +580,7 @@ const AuthManager = {
             if (e.target.matches('.forgot-password')) {
                 e.preventDefault();
                 e.stopPropagation(); 
-                this.showPasswordRecoveryModal();
+                window.location.href = 'reset_password.html'; // o './reset_password.html'
             }
         });
 
