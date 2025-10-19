@@ -397,28 +397,39 @@
     </section>
 
         <!-- Sección de Contacto -->
-    <section id="contacto" class="contact-section">
-            <div class="contact-container">
-                <h2 class="section-title">¿Tienes Preguntas?</h2>
-                <p>Envíanos un mensaje y nuestro equipo se pondrá en contacto contigo.</p>
-                <form id="contact-form" class="contact-form" novalidate>
-                    <div class="form-group">
-                        <input type="text" id="nombre" name="nombre" required>
-                        <label for="nombre">Nombre Completo</label>
-                    </div>
-                    <div class="form-group">
-                        <input type="email" id="email" name="email" required>
-                        <label for="email">Correo Electrónico</label>
-                    </div>
-                    <div class="form-group">
-                        <textarea id="mensaje" name="mensaje" rows="4" required></textarea>
-                        <label for="mensaje">Tu Mensaje</label>
-                    </div>
-                    <button type="submit" class="cta-button form-submit-btn">Enviar Mensaje</button>
-                </form>
-                <div id="form-response" class="form-response"></div>
-            </div>
-    </section>
+<section id="contacto" class="contact-section">
+  <div class="contact-container">
+    <h2 class="section-title">¿Tienes Preguntas?</h2>
+    <p>Envíanos un mensaje y nuestro equipo se pondrá en contacto contigo.</p>
+
+    <!-- Formulario que se muestra solo si hay sesión -->
+    <form id="contact-form" class="contact-form hidden" novalidate>
+      <div class="form-group">
+        <input type="text" id="nombre" name="nombre" required>
+        <label for="nombre">Nombre Completo</label>
+      </div>
+
+      <!-- Este div se oculta si hay sesión -->
+      <div class="form-group email-group">
+        <input type="email" id="email" name="email" required>
+        <label for="email">Correo Electrónico</label>
+      </div>
+
+      <div class="form-group">
+        <textarea id="mensaje" name="mensaje" rows="4" required></textarea>
+        <label for="mensaje">Tu Mensaje</label>
+      </div>
+      <button type="submit" class="cta-button form-submit-btn">Enviar Mensaje</button>
+    </form>
+
+    <!-- Mensaje para usuarios no logueados -->
+    <div id="no-auth-msg" class="no-auth-msg hidden">
+      <p>Por favor <a href="/login">inicia sesión</a> para contactarnos.</p>
+    </div>
+
+    <div id="form-response" class="form-response"></div>
+  </div>
+</section>
 
         <!-- Sección de como pagar con paypal -->
 

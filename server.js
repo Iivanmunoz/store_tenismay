@@ -310,39 +310,51 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
 
-// Ruta original de contacto (mantener como está)
 app.post('/registrar', async (req, res) => {
-    const { nombre, email, mensaje } = req.body;
-    
-    if (!nombre || !email || !mensaje) {
-        return res.status(400).json({ success: false, message: 'Todos los campos son obligatorios.' });
-    }
-    
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-        return res.status(400).json({ success: false, message: 'Email inválido.' });
-    }
-    
-    try {
-        const query = 'INSERT INTO clientes (nombre, correo_electronico, mensaje) VALUES (?, ?, ?)';
-        const [result] = await pool.execute(query, [nombre, email, mensaje]);
-        
-        console.log('--- Contacto Guardado ---');
-        console.log(`ID: ${result.insertId}`);
-        console.log(`Nombre: ${nombre}`);
-        console.log(`Email: ${email}`);
-        console.log('------------------------');
-        
-        res.status(200).json({ 
-            success: true, 
-            message: '¡Gracias por tu mensaje! Nos pondremos en contacto pronto.',
-            id: result.insertId 
-        });
-        
-    } catch (error) {
-        console.error('Error al insertar contacto:', error);
-        res.status(500).json({ success: false, message: 'Error interno del servidor.' });
-    }
+  let { nombre, email, mensaje } = req.body;
+
+  // 1. Si hay sesión, obtenemos el email desde la BD
+  if (req.session && req.session.clienteId && !email) {
+    const [rows] = await pool.execute(
+      'SELECT correo_electronico FROM clientes WHERE id = ?',
+      [req.session.clienteId]
+    );
+    if (!rows.length) return res.status(401).json({ success: false, message: 'Sesión inválida' });
+    email = rows[0].correo_electronico;
+  }
+
+  // 2. Validaciones
+  if (!nombre || !email || !mensaje) {
+    return res.status(400).json({ success: false, message: 'Todos los campos son obligatorios.' });
+  }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ success: false, message: 'Email inválido.' });
+  }
+
+  // 3. Guardar mensaje (en la misma tabla o en una nueva, tú decides)
+  try {
+    const query = 'INSERT INTO clientes (nombre, correo_electronico, mensaje) VALUES (?, ?, ?)';
+    const [result] = await pool.execute(query, [nombre, email, mensaje]);
+
+    res.json({
+      success: true,
+      message: '¡Gracias por tu mensaje! Nos pondremos en contacto pronto.',
+      id: result.insertId
+    });
+  } catch (e) {
+    console.error('Error al insertar contacto:', e);
+    res.status(500).json({ success: false, message: 'Error interno del servidor.' });
+  }
+});
+
+// GET /api/me  -> devuelve { logged: true, nombre: '...' } o { logged: false }
+app.get('/api/me', (req, res) => {
+  if (req.session && req.session.clienteId) {
+    //devolver también el nombre que ya tienes en BD
+    return res.json({ logged: true, nombre: req.session.clienteNombre });
+  }
+  res.json({ logged: false });
 });
 
 // Rutas protegidas - requieren autenticación

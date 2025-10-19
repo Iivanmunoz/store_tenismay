@@ -1342,60 +1342,82 @@ const NavigationManager = {
 
 // ========== GESTIÓN DE FORMULARIOS ==========
 const FormManager = {
-    init() {
-        this.initContactForm();
-    },
+  async init() {
+    await this.checkAuth();      // 1. ¿Está logueado?
+    this.initContactForm();      // 2. Preparar formulario
+  },
 
-    initContactForm() {
-        const contactForm = document.getElementById('contact-form');
-        const formResponse = document.getElementById('form-response');
+  /* ----------  Detectar sesión  ---------- */
+  async checkAuth() {
+    try {
+      const res = await fetch('/api/me');
+      const data = await res.json();
 
-        if (!contactForm) return;
+      const form = document.getElementById('contact-form');
+      const noAuth = document.getElementById('no-auth-msg');
+      const emailGroup = document.querySelector('.email-group');
 
-        contactForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            if (formResponse) {
-                formResponse.textContent = 'Enviando...';
-                formResponse.className = 'form-response';
-            }
-
-            const formData = {
-                nombre: contactForm.nombre.value,
-                email: contactForm.email.value,
-                mensaje: contactForm.mensaje.value
-            };
-
-            try {
-                const response = await fetch('/registrar', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(formData)
-                });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    if (formResponse) {
-                        formResponse.textContent = result.message;
-                        formResponse.classList.add('success');
-                    }
-                    contactForm.reset();
-                    NotificationManager.showSuccess('Mensaje enviado correctamente');
-                } else {
-                    throw new Error(result.message);
-                }
-
-            } catch (error) {
-                const errorMessage = `Error: ${error.message || 'No se pudo enviar el mensaje.'}`;
-                if (formResponse) {
-                    formResponse.textContent = errorMessage;
-                    formResponse.classList.add('error');
-                }
-                NotificationManager.showError(errorMessage);
-            }
-        });
+      if (data.logged) {
+        // Mostrar formulario SIN email
+        form.classList.remove('hidden');
+        emailGroup.style.display = 'none';
+        // Precargar el nombre que ya tenemos
+        document.getElementById('nombre').value = data.nombre || '';
+      } else {
+        // Mostrar aviso
+        noAuth.classList.remove('hidden');
+      }
+    } catch (e) {
+      console.error('No se pudo verificar sesión', e);
     }
+  },
+
+  /* ----------  Envío del formulario  ---------- */
+  initContactForm() {
+    const contactForm = document.getElementById('contact-form');
+    const formResponse = document.getElementById('form-response');
+    if (!contactForm) return;
+
+    contactForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (formResponse) {
+        formResponse.textContent = 'Enviando...';
+        formResponse.className = 'form-response';
+      }
+
+      const isLogged = !document.querySelector('.email-group').offsetParent; // está oculto?
+      const body = {
+        nombre: contactForm.nombre.value.trim(),
+        mensaje: contactForm.mensaje.value.trim()
+      };
+
+      // Solo enviamos email si el campo está visible
+      if (!isLogged) body.email = contactForm.email.value.trim();
+
+      try {
+        const res = await fetch('/registrar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        const result = await res.json();
+
+        if (result.success) {
+          formResponse.textContent = result.message;
+          formResponse.classList.add('success');
+          contactForm.reset();
+          NotificationManager.showSuccess('Mensaje enviado correctamente');
+        } else {
+          throw new Error(result.message);
+        }
+      } catch (err) {
+        const msg = `Error: ${err.message || 'No se pudo enviar el mensaje.'}`;
+        formResponse.textContent = msg;
+        formResponse.classList.add('error');
+        NotificationManager.showError(msg);
+      }
+    });
+  }
 };
 
 // ========== GESTIÓN DE PAYPAL ==========
