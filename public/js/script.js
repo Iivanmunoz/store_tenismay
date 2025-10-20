@@ -579,8 +579,15 @@ const AuthManager = {
         document.addEventListener('click', (e) => {
             if (e.target.matches('.forgot-password')) {
                 e.preventDefault();
-                e.stopPropagation(); 
-                window.location.href = 'reset_password.html'; // o './reset_password.html'
+                e.stopPropagation();
+
+                // 1. Cierra el modal de login
+                if (DOM_CACHE.authModal) {
+                    DOM_CACHE.authModal.style.display = 'none';
+                }
+
+                // 2. Muestra el modal de recuperación
+                this.showPasswordRecoveryModal();
             }
         });
 
