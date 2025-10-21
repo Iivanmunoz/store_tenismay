@@ -937,7 +937,7 @@ app.post('/api/auth/forgot-password', async (req, res) => {
         );
         
         // 4. Enviar email con el enlace de recuperación
-        const resetUrl = `http://localhost:3000/reset_password.html?token=${resetToken}`;
+        const resetUrl = `https://storetenismay-production.up.railway.app/reset_password.html?token=${resetToken}`;
         await sendPasswordResetEmail(email, resetUrl);
 
         console.log('--- Token de Recuperación Generado ---');
