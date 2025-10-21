@@ -3288,3 +3288,13 @@ body {
   .tutorial-wrapper{gap:20px}
   .step-icon{width:90px;height:90px}
 }
+
+
+#passwordRecoveryModal {
+    display: none;
+    /* tus estilos de modal */
+}
+
+#passwordRecoveryModal.active {
+    display: flex;
+}

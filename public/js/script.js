@@ -532,19 +532,19 @@ const AuthManager = {
             if (e.target.id === 'authBackdrop') {
                 document.getElementById('authModal').classList.remove('active');
             }
-            if (e.target === DOM_CACHE.passwordRecoveryModal) {
-                DOM_CACHE.passwordRecoveryModal.style.display = 'none';
-            }
+        if (e.target === DOM_CACHE.passwordRecoveryModal) {
+            this.closePasswordRecoveryModal();
+        }
         });
 
         // Cerrar modal de recuperación con ESC
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                if (DOM_CACHE.passwordRecoveryModal?.style.display === 'flex') {
-                    DOM_CACHE.passwordRecoveryModal.style.display = 'none';
+                if (DOM_CACHE.passwordRecoveryModal?.classList.contains('active')) {
+                    this.closePasswordRecoveryModal();
                 }
-                if (DOM_CACHE.authModal?.style.display === 'flex') {
-                    DOM_CACHE.authModal.style.display = 'none';
+                if (DOM_CACHE.authModal?.classList.contains('active')) {
+                    this.closeAuthModal();
                 }
             }
         });
@@ -576,34 +576,32 @@ const AuthManager = {
         });
 
         // Enlace de contraseña olvidada
+        //HACER OTRA RAMA PARA MODIFICAR EN LOCAL Y DEJAR PRODUCCION LIMPIA
+        //EL LINK OLVIDE CONTRASEÑA NO FUNCIONA SE CIERRA Y SE TIENE QUE CARGAR LA PAGINA  PARA ABRIR OTRA VEZ EN MODAL
         document.addEventListener('click', (e) => {
             if (e.target.matches('.forgot-password')) {
                 e.preventDefault();
                 e.stopPropagation();
 
-                // 1. Cierra el modal de login
-                if (DOM_CACHE.authModal) {
-                    DOM_CACHE.authModal.style.display = 'none';
-                }
-
-                // 2. Muestra el modal de recuperación
+                this.closeAuthModal(); // <-- Usa una función para cerrar el modal de auth
                 this.showPasswordRecoveryModal();
+                
             }
         });
+
+
+
+        
 
         // Enlaces "switch-tab" en el modal de recuperación
         document.querySelectorAll('#passwordRecoveryModal .switch-tab').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
                 const tabName = link.getAttribute('data-tab');
-                
+
                 this.closePasswordRecoveryModal();
-                
-                // Abrir modal de autenticación y cambiar al tab correcto
-                if (DOM_CACHE.authModal) {
-                        document.getElementById('authModal').classList.add('active');
-                    this.switchTab(tabName);
-                }
+                this.openAuthModal(); // <-- Nueva función
+                this.switchTab(tabName);
             });
         });
 
@@ -867,25 +865,33 @@ const AuthManager = {
     // Función para mostrar modal de recuperación
     showPasswordRecoveryModal() {
         if (DOM_CACHE.authModal) {
-            DOM_CACHE.authModal.style.display = 'none';
+            DOM_CACHE.authModal.classList.remove('active');
         }
         if (DOM_CACHE.passwordRecoveryModal) {
-            DOM_CACHE.passwordRecoveryModal.style.display = 'flex';
-            
-            // Enfocar el campo de email después de la animación
+            DOM_CACHE.passwordRecoveryModal.classList.add('active');
             setTimeout(() => {
                 const emailInput = document.getElementById('recovery-email');
-                if (emailInput) {
-                    emailInput.focus();
-                }
+                if (emailInput) emailInput.focus();
             }, 300);
+        }
+    },
+
+    closeAuthModal() {
+        if (DOM_CACHE.authModal) {
+            DOM_CACHE.authModal.classList.remove('active');
+        }
+    },
+
+    openAuthModal() {
+        if (DOM_CACHE.authModal) {
+            DOM_CACHE.authModal.classList.add('active');
         }
     },
 
     // Función para cerrar modal de recuperación
     closePasswordRecoveryModal() {
         if (DOM_CACHE.passwordRecoveryModal) {
-            DOM_CACHE.passwordRecoveryModal.style.display = 'none';
+            DOM_CACHE.passwordRecoveryModal.classList.remove('active');
         }
         if (DOM_CACHE.recoveryForm) {
             DOM_CACHE.recoveryForm.reset();
