@@ -12,6 +12,8 @@ const bcrypt = require('bcrypt');
 const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
 const paypal = require('@paypal/checkout-server-sdk');
+const crypto = require('crypto');
+
 
 
 
@@ -882,13 +884,7 @@ app.post('/api/paypal/capture-order', requireAuth, async (req, res) => {
 
 // Función para generar token seguro
 function generateSecureToken() {
-
-    const timestamp = Date.now().toString(36);
-    const randomPart1 = Math.random().toString(36).substring(2, 15);
-    const randomPart2 = Math.random().toString(36).substring(2, 15);
-    const randomPart3 = Math.random().toString(36).substring(2, 15);
-    
-    return timestamp + randomPart1 + randomPart2 + randomPart3;
+    return crypto.randomBytes(32).toString('hex');
 }
     // Ruta para solicitar recuperación de contraseña
 app.post('/api/auth/forgot-password', async (req, res) => {
