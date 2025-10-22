@@ -6,7 +6,7 @@ const sendPasswordResetEmail = async (email, resetUrl) => {
     to: email,
     from: {
       name: 'TennisMay',
-      address: process.env.FROM_EMAIL,
+      address: 'tennismay19@gmail.com', // ← hardcode temporal
     },
     subject: 'Recuperación de Contraseña',
     html: `

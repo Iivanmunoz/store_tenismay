@@ -23,15 +23,6 @@ const crypto = require('crypto');
 const { verifyConnection } = require('./services/emailService');
 const { sendPasswordResetEmail } = require('./services/emailServiceSendGrid');
 
-// Al iniciar el servidor
-(async () => {
-  try {
-    await sendPasswordResetEmail('tennismay19@gmail.com', 'https://test.com/token=fake');
-    console.log('✅ SendGrid funcionando correctamente');
-  } catch (err) {
-    console.error('❌ SendGrid no está funcionando:', err.message);
-  }
-})();
 
 const app = express();
 app.use(express.static('public'));
