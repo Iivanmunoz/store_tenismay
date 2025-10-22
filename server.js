@@ -21,7 +21,19 @@ const crypto = require('crypto');
 // | Requerimientos e Inicialización del servidor de correos                    |
 // -----------------------------------------------------------------------------
 const { verifyConnection } = require('./services/emailService');
-const { sendPasswordResetEmail } = require('./services/emailService');
+const { sendPasswordResetEmail } = require('./services/emailServiceSendGrid');
+
+const { sendPasswordResetEmail } = require('./emailServiceSendGrid');
+
+// Al iniciar el servidor
+(async () => {
+  try {
+    await sendPasswordResetEmail('tennismay19@gmail.com', 'https://test.com/token=fake');
+    console.log('✅ SendGrid funcionando correctamente');
+  } catch (err) {
+    console.error('❌ SendGrid no está funcionando:', err.message);
+  }
+})();
 
 const app = express();
 app.use(express.static('public'));
@@ -934,7 +946,13 @@ app.post('/api/auth/forgot-password', async (req, res) => {
         
         // 4. Enviar email con el enlace de recuperación
         const resetUrl = `https://storetenismay-production.up.railway.app/reset_password.html?token=${resetToken}`;
+
+        try {
         await sendPasswordResetEmail(email, resetUrl);
+        } catch (emailError) {
+        console.error('❌ Error al enviar correo:', emailError.message);
+        // Aún respondemos éxito porque el token ya se generó
+        }
 
         console.log('--- Token de Recuperación Generado ---');
         console.log(`Email: ${email}`);
