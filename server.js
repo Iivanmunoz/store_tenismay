@@ -23,8 +23,6 @@ const crypto = require('crypto');
 const { verifyConnection } = require('./services/emailService');
 const { sendPasswordResetEmail } = require('./services/emailServiceSendGrid');
 
-const { sendPasswordResetEmail } = require('./emailServiceSendGrid');
-
 // Al iniciar el servidor
 (async () => {
   try {
