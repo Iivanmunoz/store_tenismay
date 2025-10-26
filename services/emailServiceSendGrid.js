@@ -8,7 +8,7 @@ const sendPasswordResetEmail = async (email, resetUrl) => {
     to: email,
     from: {
       name: 'TennisMay',
-      address: 'tennismay19@gmail.com', // ← hardcode temporal
+      address: 'hola@hermanostenis.com', // ← hardcode temporal
     },
     subject: 'Recuperación de Contraseña',
     html: `
