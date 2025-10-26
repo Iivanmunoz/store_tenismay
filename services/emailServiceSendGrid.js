@@ -1,5 +1,7 @@
 const sgMail = require('@sendgrid/mail');
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+// sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+// const { Resend } = require('resend');
+const resend = new Resend('re_D72m91UF_568oDeouXG7KTDeK25wdkQnu');
 
 const sendPasswordResetEmail = async (email, resetUrl) => {
   const msg = {
