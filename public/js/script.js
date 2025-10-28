@@ -578,14 +578,11 @@ const AuthManager = {
         // Enlace de contraseña olvidada
         //HACER OTRA RAMA PARA MODIFICAR EN LOCAL Y DEJAR PRODUCCION LIMPIA
         //EL LINK OLVIDE CONTRASEÑA NO FUNCIONA SE CIERRA Y SE TIENE QUE CARGAR LA PAGINA  PARA ABRIR OTRA VEZ EN MODAL
-        document.addEventListener('click', (e) => {
+        document.addEventListener('mousedown', (e) => {
             if (e.target.matches('.forgot-password')) {
                 e.preventDefault();
-                e.stopPropagation();
-
-                this.closeAuthModal(); // <-- Usa una función para cerrar el modal de auth
+                this.closeAuthModal();
                 this.showPasswordRecoveryModal();
-                
             }
         });
 
