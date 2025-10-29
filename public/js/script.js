@@ -578,20 +578,20 @@ const AuthManager = {
         // Enlace de contraseña olvidada
         //HACER OTRA RAMA PARA MODIFICAR EN LOCAL Y DEJAR PRODUCCION LIMPIA
         //EL LINK OLVIDE CONTRASEÑA NO FUNCIONA SE CIERRA Y SE TIENE QUE CARGAR LA PAGINA  PARA ABRIR OTRA VEZ EN MODAL
-        document.addEventListener('click', (e) => {
-        if (e.target.matches('.forgot-password')) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        e.stopPropagation();
+        // document.addEventListener('click', (e) => {
+        // if (e.target.matches('.forgot-password')) {
+        // e.preventDefault();
+        // e.stopImmediatePropagation();
+        // e.stopPropagation();
 
-        this.closeAuthModal();
+        // this.closeAuthModal();
 
-        // Pequeño retraso para asegurar que el cierre se complete
-        setTimeout(() => {
-            this.showPasswordRecoveryModal();
-        }, 100);
-        }
-        });
+        // // Pequeño retraso para asegurar que el cierre se complete
+        // setTimeout(() => {
+        //     this.showPasswordRecoveryModal();
+        // }, 100);
+        // }
+        // });
 
 
 
