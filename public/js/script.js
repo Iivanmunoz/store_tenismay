@@ -579,11 +579,14 @@ const AuthManager = {
         //HACER OTRA RAMA PARA MODIFICAR EN LOCAL Y DEJAR PRODUCCION LIMPIA
         //EL LINK OLVIDE CONTRASEÑA NO FUNCIONA SE CIERRA Y SE TIENE QUE CARGAR LA PAGINA  PARA ABRIR OTRA VEZ EN MODAL
         document.addEventListener('mousedown', (e) => {
-            if (e.target.matches('.forgot-password')) {
-                e.preventDefault();
-                this.closeAuthModal();
-                this.showPasswordRecoveryModal();
-            }
+        if (e.target.matches('.forgot-password')) {
+            e.preventDefault();
+            e.stopImmediatePropagation(); // ← detiene cualquier otro listener
+            e.stopPropagation();
+
+            this.closeAuthModal();
+            this.showPasswordRecoveryModal();
+        }
         });
 
 
