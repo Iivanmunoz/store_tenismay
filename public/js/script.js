@@ -866,7 +866,7 @@ const AuthManager = {
     // Función para mostrar modal de recuperación
     showPasswordRecoveryModal() {
         if (DOM_CACHE.authModal) {
-            DOM_CACHE.authModal.classList.remove('');
+            DOM_CACHE.authModal.classList.remove('active');
         }
         if (DOM_CACHE.passwordRecoveryModal) {
             DOM_CACHE.passwordRecoveryModal.classList.add('active');
