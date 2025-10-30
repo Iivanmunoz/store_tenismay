@@ -583,7 +583,7 @@ const AuthManager = {
                 e.preventDefault();
                 e.stopImmediatePropagation();
                 e.stopPropagation();
-
+                this.closeAuthModal();
 
             }
         });
