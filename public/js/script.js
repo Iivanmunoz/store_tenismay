@@ -596,7 +596,7 @@ const AuthManager = {
                 setTimeout(() => {
                 const authModal = document.getElementById('authModal');
                 if (authModal) authModal.classList.remove('active');
-                }, 100);
+                }, 1000);
             }
         });
 
