@@ -581,12 +581,22 @@ const AuthManager = {
         document.addEventListener('click', (e) => {
             if (e.target.matches('.forgot-password')) {
                 e.preventDefault();
-                e.stopImmediatePropagation();
                 e.stopPropagation();
-                this.showPasswordRecoveryModal();
-                this.closeAuthModal();
-                
-                
+                e.stopImmediatePropagation();
+
+                // 1. Abrir recuperación primero
+                const recoveryModal = document.getElementById('passwordRecoveryModal');
+                if (recoveryModal) {
+                recoveryModal.classList.add('active');
+                const emailInput = document.getElementById('recovery-email');
+                if (emailInput) emailInput.focus();
+                }
+
+                // 2. Cerrar login DESPUÉS (con retraso para evitar choque)
+                setTimeout(() => {
+                const authModal = document.getElementById('authModal');
+                if (authModal) authModal.classList.remove('active');
+                }, 100);
             }
         });
 
