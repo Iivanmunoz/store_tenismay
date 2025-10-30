@@ -584,10 +584,10 @@ const AuthManager = {
                 e.stopImmediatePropagation();
                 e.stopPropagation();
                 this.closeAuthModal();
+                this.showPasswordRecoveryModal();
                 
                 
             }
-            this.showPasswordRecoveryModal();
         });
 
 
