@@ -584,8 +584,10 @@ const AuthManager = {
                 e.stopImmediatePropagation();
                 e.stopPropagation();
                 this.closeAuthModal();
-
+                
+                
             }
+            this.showPasswordRecoveryModal();
         });
 
 
@@ -862,18 +864,18 @@ const AuthManager = {
     },
 
     // Función para mostrar modal de recuperación
-    // showPasswordRecoveryModal() {
-    //     if (DOM_CACHE.authModal) {
-    //         DOM_CACHE.authModal.classList.remove('active');
-    //     }
-    //     if (DOM_CACHE.passwordRecoveryModal) {
-    //         DOM_CACHE.passwordRecoveryModal.classList.add('active');
-    //         setTimeout(() => {
-    //             const emailInput = document.getElementById('recovery-email');
-    //             if (emailInput) emailInput.focus();
-    //         }, 300);
-    //     }
-    // },
+    showPasswordRecoveryModal() {
+        if (DOM_CACHE.authModal) {
+            DOM_CACHE.authModal.classList.remove('active');
+        }
+        if (DOM_CACHE.passwordRecoveryModal) {
+            DOM_CACHE.passwordRecoveryModal.classList.add('active');
+            setTimeout(() => {
+                const emailInput = document.getElementById('recovery-email');
+                if (emailInput) emailInput.focus();
+            }, 300);
+        }
+    },
 
     closeAuthModal() {
         if (DOM_CACHE.authModal) {
