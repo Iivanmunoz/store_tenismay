@@ -868,13 +868,13 @@ const AuthManager = {
         if (DOM_CACHE.authModal) {
             DOM_CACHE.authModal.classList.remove('active');
         }
-        // if (DOM_CACHE.passwordRecoveryModal) {
-        //     DOM_CACHE.passwordRecoveryModal.classList.add('active');
-        //     setTimeout(() => {
-        //         const emailInput = document.getElementById('recovery-email');
-        //         if (emailInput) emailInput.focus();
-        //     }, 300);
-        // }
+        if (DOM_CACHE.passwordRecoveryModal) {
+            DOM_CACHE.passwordRecoveryModal.classList.add(' ');
+            setTimeout(() => {
+                const emailInput = document.getElementById('recovery-email');
+                if (emailInput) emailInput.focus();
+            }, 300);
+        }
     },
 
     closeAuthModal() {
