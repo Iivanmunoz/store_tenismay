@@ -578,20 +578,20 @@ const AuthManager = {
         // Enlace de contraseña olvidada
         //HACER OTRA RAMA PARA MODIFICAR EN LOCAL Y DEJAR PRODUCCION LIMPIA
         //EL LINK OLVIDE CONTRASEÑA NO FUNCIONA SE CIERRA Y SE TIENE QUE CARGAR LA PAGINA  PARA ABRIR OTRA VEZ EN MODAL
-        // document.addEventListener('click', (e) => {
-        // if (e.target.matches('.forgot-password')) {
-        // e.preventDefault();
-        // e.stopImmediatePropagation();
-        // e.stopPropagation();
+        document.addEventListener('click', (e) => {
+        if (e.target.matches('.forgot-password')) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        e.stopPropagation();
 
-        // this.closeAuthModal();
+        this.closeAuthModal();
 
-        // // Pequeño retraso para asegurar que el cierre se complete
-        // setTimeout(() => {
-        //     this.showPasswordRecoveryModal();
-        // }, 100);
-        // }
-        // });
+        // Pequeño retraso para asegurar que el cierre se complete
+        setTimeout(() => {
+            this.showPasswordRecoveryModal();
+        }, 100);
+        }
+        });
 
 
 
@@ -867,18 +867,18 @@ const AuthManager = {
     },
 
     // Función para mostrar modal de recuperación
-    showPasswordRecoveryModal() {
-        if (DOM_CACHE.authModal) {
-            DOM_CACHE.authModal.classList.remove('active');
-        }
-        if (DOM_CACHE.passwordRecoveryModal) {
-            DOM_CACHE.passwordRecoveryModal.classList.add('active');
-            setTimeout(() => {
-                const emailInput = document.getElementById('recovery-email');
-                if (emailInput) emailInput.focus();
-            }, 300);
-        }
-    },
+    // showPasswordRecoveryModal() {
+    //     if (DOM_CACHE.authModal) {
+    //         DOM_CACHE.authModal.classList.remove('active');
+    //     }
+    //     if (DOM_CACHE.passwordRecoveryModal) {
+    //         DOM_CACHE.passwordRecoveryModal.classList.add('active');
+    //         setTimeout(() => {
+    //             const emailInput = document.getElementById('recovery-email');
+    //             if (emailInput) emailInput.focus();
+    //         }, 300);
+    //     }
+    // },
 
     closeAuthModal() {
         if (DOM_CACHE.authModal) {
