@@ -581,8 +581,8 @@ const AuthManager = {
         document.addEventListener('click', (e) => {
             if (e.target.matches('.forgot-password')) {
                 e.preventDefault();
-                // e.stopImmediatePropagation();
-                // e.stopPropagation();
+                e.stopImmediatePropagation();
+                e.stopPropagation();
                 this.showPasswordRecoveryModal();
                 this.closeAuthModal();
                 
