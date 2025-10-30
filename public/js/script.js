@@ -866,10 +866,10 @@ const AuthManager = {
     // Función para mostrar modal de recuperación
     showPasswordRecoveryModal() {
         if (DOM_CACHE.authModal) {
-            DOM_CACHE.authModal.classList.remove('active');
+            DOM_CACHE.authModal.classList.remove('');
         }
         if (DOM_CACHE.passwordRecoveryModal) {
-            DOM_CACHE.passwordRecoveryModal.classList.add(' ');
+            DOM_CACHE.passwordRecoveryModal.classList.add('active');
             setTimeout(() => {
                 const emailInput = document.getElementById('recovery-email');
                 if (emailInput) emailInput.focus();
