@@ -934,7 +934,7 @@ app.post('/api/auth/forgot-password', async (req, res) => {
         );
         
         // 4. Enviar email con el enlace de recuperación
-        const resetUrl = `https://storetenismay-production.up.railway.app/reset_password.html?token=${resetToken}`;
+        const resetUrl = `https://hermanostenis.com/reset_password.html?token=${resetToken}`;
 
         try {
         await sendPasswordResetEmail(email, resetUrl);
