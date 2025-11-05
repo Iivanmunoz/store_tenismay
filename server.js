@@ -62,7 +62,6 @@ const sessionStore = new MySQLStore({
 async function testConnection() {
     try {
         const connection = await pool.getConnection();
-        console.log('✅ Conexión exitosa a MySQL');
         connection.release();
     } catch (error) {
         console.error('❌ Error conectando a MySQL:', error.message);
@@ -179,11 +178,11 @@ app.post('/registernew', async (req, res) => {
             genero || null,
             preferenciaMarca || null
         ]);
-        console.log('--- Usuario Nuevo Registrado ---');
-        console.log(`ID: ${result.insertId}`);
-        console.log(`Nombre: ${nombre}`);
-        console.log(`Email: ${email}`);
-        console.log('-------------------------');
+        // console.log('--- Usuario Nuevo Registrado ---');
+        // console.log(`ID: ${result.insertId}`);
+        // console.log(`Nombre: ${nombre}`);
+        // console.log(`Email: ${email}`);
+        // console.log('-------------------------');
 
         res.status(201).json({
             success: true,
@@ -246,10 +245,10 @@ app.post('/api/auth/login', async (req, res) => {
             req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000; // 30 días
         }
 
-        console.log('--- Usuario Logueado ---');
-        console.log(`ID: ${user.id}`);
-        console.log(`Email: ${user.correo_electronico}`);
-        console.log('----------------------');
+        // console.log('--- Usuario Logueado ---');
+        // console.log(`ID: ${user.id}`);
+        // console.log(`Email: ${user.correo_electronico}`);
+        // console.log('----------------------');
 
         res.json({
             success: true,
@@ -333,7 +332,7 @@ app.post('/registrar', async (req, res) => {
     `;
     const [result] = await pool.execute(query, [nombre, email, mensaje]);
 
-    console.log('--- Mensaje Guardado ---');
+    // console.log('--- Mensaje Guardado ---');
     // console.log(`ID: ${result.insertId}`);
     // console.log(`Nombre: ${nombre}`);
     // console.log(`Email: ${email}`);
@@ -649,9 +648,9 @@ app.get('/api/productos/mas-baratos', async (req, res) => {
         const query = 'SELECT codigo, nombre, precio, tallas_disponibles, nivel_stock FROM productos ORDER BY precio ASC';
         const [productos] = await pool.execute(query);
         
-        console.log('--- Productos Más Baratos ---');
-        console.log(`Productos encontrados: ${productos.length}`);
-        console.log('-----------------------------');
+        // console.log('--- Productos Más Baratos ---');
+        // console.log(`Productos encontrados: ${productos.length}`);
+        // console.log('-----------------------------');
         
         res.json({
             success: true,
@@ -674,9 +673,9 @@ app.get('/api/productos/mas-caros', async (req, res) => {
         const query = 'SELECT codigo, nombre, precio, tallas_disponibles, nivel_stock FROM productos ORDER BY precio DESC';
         const [productos] = await pool.execute(query);
         
-        console.log('--- Productos Más Caros ---');
-        console.log(`Productos encontrados: ${productos.length}`);
-        console.log('--------------------------');
+        // console.log('--- Productos Más Caros ---');
+        // console.log(`Productos encontrados: ${productos.length}`);
+        // console.log('--------------------------');
         
         res.json({
             success: true,
@@ -943,11 +942,11 @@ app.post('/api/auth/forgot-password', async (req, res) => {
         // Aún respondemos éxito porque el token ya se generó
         }
 
-        console.log('--- Token de Recuperación Generado ---');
-        console.log(`Email: ${email}`);
-        console.log(`Token: ${resetToken}`);
-        console.log(`Expira: ${resetTokenExpiry}`);
-        console.log('------------------------------------');
+        // console.log('--- Token de Recuperación Generado ---');
+        // console.log(`Email: ${email}`);
+        // console.log(`Token: ${resetToken}`);
+        // console.log(`Expira: ${resetTokenExpiry}`);
+        // console.log('------------------------------------');
         
         res.status(200).json({ 
             success: true, 
@@ -1017,13 +1016,13 @@ app.post('/api/auth/reset-password', async (req, res) => {
 // | Inicio del Servidor                                                       |
 // -----------------------------------------------------------------------------
 app.listen(PORT, () => {
-    console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+    // console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
     console.log(`📦 Entorno: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`💳 PayPal configurado: ${!!(process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET)}`);
+    // console.log(`💳 PayPal configurado: ${!!(process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET)}`);
     
     if (!process.env.PAYPAL_CLIENT_ID || !process.env.PAYPAL_CLIENT_SECRET) {
         console.warn('⚠️  ADVERTENCIA: Credenciales de PayPal no configuradas');
     }
     
-    console.log('Conectando a MySQL...');
+    // console.log('Conectando a MySQL...');
 });

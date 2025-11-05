@@ -1700,5 +1700,5 @@ if (window.location.hostname === 'localhost') {
         cart: () => cart,
         config: CONFIG
     };
-    console.log('🔧 Modo debug habilitado. Usa window.DEBUG para acceder a los managers.');
+    // console.log('🔧 Modo debug habilitado. Usa window.DEBUG para acceder a los managers.');
 }
