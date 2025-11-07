@@ -54,4 +54,14 @@ const sendPasswordResetEmail = async (email, resetUrl) => {
   }
 };
 
-module.exports = { sendPasswordResetEmail };
+const verifyConnection = async () => {
+  try {
+    console.log('✅ Conexión SMTP verificada correctamente');
+    return true;
+  } catch (error) {
+    console.error('❌ Error en conexión SMTP:', error);
+    return false;
+  }
+};
+
+module.exports = { sendPasswordResetEmail,verifyConnection };

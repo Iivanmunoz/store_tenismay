@@ -20,8 +20,8 @@ const crypto = require('crypto');
 // -----------------------------------------------------------------------------
 // | Requerimientos e Inicialización del servidor de correos                    |
 // -----------------------------------------------------------------------------
-const { verifyConnection } = require('./services/emailService');
-const { sendPasswordResetEmail } = require('./services/emailServiceSendGrid');
+// const { verifyConnection } = require('./services/emailService');
+const { sendPasswordResetEmail,verifyConnection } = require('./services/emailServiceSendGrid');
 
 
 const app = express();
@@ -31,11 +31,21 @@ const PORT = process.env.PORT || 3000;
 // -----------------------------------------------------------------------------
 // | Configuración de la Base de Datos MySQL                                   |
 // -----------------------------------------------------------------------------
+// const dbConfig = {
+//     host: 'mysql.railway.internal',
+//     user: 'root',
+//     password: 'KxvPCoTBQFFOBLACyubsEHxDIfTVqKPk',
+//     database: 'railway',
+//     port: process.env.DB_PORT || 3306,
+//     waitForConnections: true,
+//     connectionLimit: 10,
+//     queueLimit: 0
+// };
 const dbConfig = {
-    host: 'mysql.railway.internal',
-    user: 'root',
-    password: 'KxvPCoTBQFFOBLACyubsEHxDIfTVqKPk',
-    database: 'railway',
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD, // Variable de entorno
+    database: process.env.DB_NAME || 'mi_bd',
     port: process.env.DB_PORT || 3306,
     waitForConnections: true,
     connectionLimit: 10,
