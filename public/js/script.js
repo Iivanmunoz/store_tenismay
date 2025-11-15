@@ -134,11 +134,10 @@ const CartManager = {
 
     // Actualizar display del carrito 
     updateDisplay() {
+        this._applyVolumeDiscounts();   // <-- aplica descuento
         this.updateCounter();
         this.updateCartContent();
         this.updateTotal();
-        
-       
     },
     
     bindEvents() {
@@ -251,6 +250,12 @@ const CartManager = {
             size: productData.selectedSize,
             quantity: 1
         };
+        // --- guardar precio original solo la primera vez ---
+        if (!product.originalPrice) product.originalPrice = product.price;
+        
+        // --- descuento por volumen ---
+        const futureQty = cart.reduce((sum, item) => sum + item.quantity, 0) + 1;
+        product.price = this._getVolumePrice(product.price, futureQty);
 
         const existingItemIndex = cart.findIndex(item => item.id === product.id);
 
@@ -426,6 +431,20 @@ const CartManager = {
                 NotificationManager.showError(errorMessage);
             }
         );
+    },
+    // ====== DESCUENTOS POR VOLUMEN ======
+    _getVolumePrice(unitPrice, qtyInCart) {
+        if (qtyInCart >= 10) return 600.00;
+        if (qtyInCart >= 3)  return 630.00;
+        return unitPrice;   // precio normal
+    },
+
+    _applyVolumeDiscounts() {
+        const totalQty = cart.reduce((sum, item) => sum + item.quantity, 0);
+        cart.forEach(item => {
+            const base = item.originalPrice || item.price;   // fallback por si acaso
+            item.price = this._getVolumePrice(base, totalQty);
+        });
     }
     
 };
