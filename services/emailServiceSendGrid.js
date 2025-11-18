@@ -4,7 +4,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const sendPasswordResetEmail = async (email, resetUrl) => {
   try {
     await resend.emails.send({
-      from: 'TennisMay <hola@hermanostenis.com>',
+      from: 'TennisMay <tickets_orden@hermanostenis.com>',
       to: email,
       subject: 'Recuperación de Contraseña',
       html: `
@@ -54,4 +54,14 @@ const sendPasswordResetEmail = async (email, resetUrl) => {
   }
 };
 
-module.exports = { sendPasswordResetEmail };
+const verifyConnection = async () => {
+  try {
+    console.log('✅ Conexión SMTP verificada correctamente');
+    return true;
+  } catch (error) {
+    console.error('❌ Error en conexión SMTP:', error);
+    return false;
+  }
+};
+
+module.exports = { sendPasswordResetEmail,verifyConnection };

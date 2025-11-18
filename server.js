@@ -20,8 +20,8 @@ const crypto = require('crypto');
 // -----------------------------------------------------------------------------
 // | Requerimientos e Inicialización del servidor de correos                    |
 // -----------------------------------------------------------------------------
-const { verifyConnection } = require('./services/emailService');
-const { sendPasswordResetEmail } = require('./services/emailServiceSendGrid');
+// const { verifyConnection } = require('./services/emailService');
+const { sendPasswordResetEmail,verifyConnection } = require('./services/emailServiceSendGrid');
 
 
 const app = express();
@@ -31,11 +31,21 @@ const PORT = process.env.PORT || 3000;
 // -----------------------------------------------------------------------------
 // | Configuración de la Base de Datos MySQL                                   |
 // -----------------------------------------------------------------------------
+// const dbConfig = {
+//     host: 'mysql.railway.internal',
+//     user: 'root',
+//     password: 'KxvPCoTBQFFOBLACyubsEHxDIfTVqKPk',
+//     database: 'railway',
+//     port: process.env.DB_PORT || 3306,
+//     waitForConnections: true,
+//     connectionLimit: 10,
+//     queueLimit: 0
+// };
 const dbConfig = {
-    host: 'mysql.railway.internal',
-    user: 'root',
-    password: 'KxvPCoTBQFFOBLACyubsEHxDIfTVqKPk',
-    database: 'railway',
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD, // Variable de entorno
+    database: process.env.DB_NAME || 'mi_bd',
     port: process.env.DB_PORT || 3306,
     waitForConnections: true,
     connectionLimit: 10,
@@ -102,7 +112,7 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     cookie: {
-        maxAge: 24 * 60 * 60 * 1000, // 24 horas
+        maxAge: 12 * 60 * 60 * 1000, // 12 horas
         httpOnly: true,
         secure: false // cambiar a true en producción con HTTPS
     }
@@ -242,7 +252,7 @@ app.post('/api/auth/login', async (req, res) => {
 
         // Configurar duración de cookie si "recordar" está marcado
         if (remember) {
-            req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000; // 30 días
+            req.session.cookie.maxAge = 12 * 60 * 60 * 1000; // 12 horas
         }
 
         // console.log('--- Usuario Logueado ---');
@@ -467,6 +477,284 @@ app.get('/api/pedidos/historial', requireAuth, async (req, res) => {
         });
     }
 });
+
+// 📊 Dashboard: métricas generales
+app.get('/api/dashboard/resumen', async (req, res) => {
+    const { fechaInicio, fechaFin, tipo, marca } = req.query;
+
+    let where = [];
+    let params = [];
+
+    if (fechaInicio) {
+        where.push("p.fecha_pedido >= ?");
+        params.push(fechaInicio);
+    }
+    if (fechaFin) {
+        where.push("p.fecha_pedido <= ?");
+        params.push(fechaFin);
+    }
+    if (tipo) {
+        where.push("pr.tipo = ?");
+        params.push(tipo);
+    }
+    if (marca) {
+        where.push("pr.marca = ?");
+        params.push(marca);
+    }
+
+    const whereClause = where.length ? `WHERE ${where.join(" AND ")}` : "";
+
+    try {
+        const [[{ totalVentas, totalGanancias, totalPedidos }]] = await pool.execute(`
+            SELECT 
+                SUM(p.monto_total) AS totalVentas,
+                SUM(ip.cantidad * (ip.precio_compra - COALESCE(pt.precio_ajuste, 0))) AS totalGanancias,
+                COUNT(DISTINCT p.id) AS totalPedidos
+            FROM pedidos p
+            JOIN items_pedido ip ON p.id = ip.pedido_id
+            JOIN productos pr ON ip.producto_id = pr.id
+            LEFT JOIN producto_tallas pt ON pr.id = pt.producto_id AND pt.talla_id = (
+                SELECT id FROM tallas WHERE talla = ip.talla LIMIT 1
+            ${whereClause}
+        `, params);
+
+        const [[{ productosVendidos }]] = await pool.execute(`
+            SELECT SUM(ip.cantidad) AS productosVendidos
+            FROM items_pedido ip
+            JOIN pedidos p ON ip.pedido_id = p.id
+            JOIN productos pr ON ip.producto_id = pr.id
+            ${whereClause}
+        `, params);
+
+        res.json({
+            success: true,
+            data: {
+                totalVentas: totalVentas || 0,
+                totalGanancias: totalGanancias || 0,
+                totalPedidos: totalPedidos || 0,
+                productosVendidos: productosVendidos || 0
+            }
+        });
+    } catch (error) {
+        console.error("Error en dashboard/resumen:", error);
+        res.status(500).json({ success: false, message: "Error interno" });
+    }
+});
+
+// 📈 Top productos más vendidos
+app.get('/api/dashboard/top-productos', async (req, res) => {
+    const { limite = 5 } = req.query;
+    try {
+        const [rows] = await pool.execute(`
+            SELECT 
+                pr.nombre,
+                SUM(ip.cantidad) AS vendidos
+            FROM items_pedido ip
+            JOIN productos pr ON ip.producto_id = pr.id
+            GROUP BY pr.id
+            ORDER BY vendidos DESC
+            LIMIT ?
+        `, [parseInt(limite)]);
+        res.json({ success: true, data: rows });
+    } catch (error) {
+        console.error("Error en top-productos:", error);
+        res.status(500).json({ success: false });
+    }
+});
+
+// 📦 Stock bajo
+app.get('/api/dashboard/stock-bajo', async (req, res) => {
+    try {
+        const [rows] = await pool.execute(`
+            SELECT codigo, nombre, nivel_stock
+            FROM productos
+            WHERE nivel_stock < 10
+        `);
+        res.json({ success: true, data: rows });
+    } catch (error) {
+        console.error("Error en stock-bajo:", error);
+        res.status(500).json({ success: false });
+    }
+});
+
+// GET /api/dashboard/ventas-mes?año=2025&mes=11 dashboard  Ventas del mes (con filtro por año y mes)
+app.get('/api/dashboard/ventas-mes', async (req, res) => {
+    const { año = new Date().getFullYear(), mes = new Date().getMonth() + 1 } = req.query;
+
+    try {
+        const [rows] = await pool.execute(`
+            SELECT 
+                SUM(p.monto_total) AS totalVentas,
+                COUNT(DISTINCT p.id) AS totalPedidos
+            FROM pedidos p
+            WHERE YEAR(p.fecha_pedido) = ? AND MONTH(p.fecha_pedido) = ?
+        `, [año, mes]);
+
+        res.json({
+            success: true,
+            data: {
+                totalVentas: rows[0].totalVentas || 0,
+                totalPedidos: rows[0].totalPedidos || 0
+            }
+        });
+    } catch (error) {
+        console.error("Error en ventas-mes:", error);
+        res.status(500).json({ success: false, message: "Error interno" });
+    }
+});
+
+
+//  👟 Top tenis más vendido (por ganancia)
+app.get('/api/dashboard/top-tenis-ganancia', async (req, res) => {
+    const { periodo = 'mes' } = req.query;
+
+    let fechaInicio = new Date();
+    if (periodo === 'mes') fechaInicio.setMonth(fechaInicio.getMonth() - 1);
+    if (periodo === '3meses') fechaInicio.setMonth(fechaInicio.getMonth() - 3);
+    if (periodo === 'año') fechaInicio.setFullYear(fechaInicio.getFullYear() - 1);
+
+    try {
+        const [rows] = await pool.execute(`
+            SELECT 
+                pr.nombre,
+                SUM(ip.cantidad * ip.precio_compra) AS gananciaGenerada
+            FROM items_pedido ip
+            JOIN pedidos p ON ip.pedido_id = p.id
+            JOIN productos pr ON ip.producto_id = pr.id
+            WHERE p.fecha_pedido >= ?
+            GROUP BY pr.id
+            ORDER BY gananciaGenerada DESC
+            LIMIT 1
+        `, [fechaInicio]);
+
+        if (rows.length === 0) {
+            return res.json({ success: true, data: { nombre: '-', gananciaGenerada: 0 } });
+        }
+
+        res.json({ success: true, data: rows[0] });
+    } catch (error) {
+        console.error("Error en top-tenis-ganancia:", error);
+        res.status(500).json({ success: false, message: "Error interno" });
+    }
+});
+
+// Código corregido (usa nivel_stock y actualizado_en):
+app.get('/api/dashboard/stock-diario', async (req, res) => {
+    const { tipo = 'dia' } = req.query;
+
+    let fechaInicio = new Date();
+    if (tipo === 'semana') fechaInicio.setDate(fechaInicio.getDate() - 7);
+    if (tipo === 'dia') fechaInicio.setDate(fechaInicio.getDate() - 1);
+
+    try {
+        const [rows] = await pool.execute(`
+            SELECT 
+                DATE(actualizado_en) AS fecha,
+                SUM(nivel_stock) AS stockTotal
+            FROM productos
+            WHERE actualizado_en >= ?
+            GROUP BY fecha
+            ORDER BY fecha ASC
+        `, [fechaInicio]);
+
+        res.json({ success: true, data: rows });
+    } catch (error) {
+        console.error("Error en stock-diario:", error);
+        res.status(500).json({ success: false, message: "Error interno" });
+    }
+});
+// ventas netas por semana
+app.get('/api/dashboard/ventas-netas-semana', async (req, res) => {
+    const { rango = '3semanas' } = req.query;
+
+    let fechaInicio = new Date();
+    if (rango === '3semanas') fechaInicio.setDate(fechaInicio.getDate() - 21);
+    if (rango === 'mes') fechaInicio.setMonth(fechaInicio.getMonth() - 1);
+    if (rango === 'año') fechaInicio.setFullYear(fechaInicio.getFullYear() - 1);
+
+    try {
+        const [rows] = await pool.execute(`
+            SELECT 
+                YEARWEEK(fecha_pedido, 1) AS semana,
+                SUM(monto_total) AS ventasNetas
+            FROM pedidos
+            WHERE fecha_pedido >= ?
+            GROUP BY semana
+            ORDER BY semana ASC
+        `, [fechaInicio]);
+
+        res.json({ success: true, data: rows });
+    } catch (error) {
+        console.error("Error en ventas-netas-semana:", error);
+        res.status(500).json({ success: false, message: "Error interno" });
+    }
+});
+// GET /api/dashboard/ventas-tiempo?tipo=mes (año, mes, semana)
+app.get('/api/dashboard/ventas-tiempo', async (req, res) => {
+    const { tipo = 'mes' } = req.query;
+
+    let formato = '%Y'; // año
+    if (tipo === 'mes') formato = '%Y-%m';
+    if (tipo === 'semana') formato = '%X-%V'; // ISO week
+
+    try {
+        const [rows] = await pool.execute(`
+            SELECT 
+                DATE_FORMAT(p.fecha_pedido, '${formato}') AS periodo,
+                SUM(p.monto_total) AS totalVentas
+            FROM pedidos p
+            GROUP BY periodo
+            ORDER BY periodo ASC
+            LIMIT 12
+        `);
+
+        res.json({ success: true, data: rows });
+    } catch (error) {
+        console.error("Error en ventas-tiempo:", error);
+        res.status(500).json({ success: false, message: "Error interno" });
+    }
+});
+// GET /api/dashboard/marcas-vendidas
+app.get('/api/dashboard/marcas-vendidas', async (req, res) => {
+    try {
+        const [rows] = await pool.execute(`
+            SELECT 
+                c.preferencia_marca AS marca,
+                COUNT(DISTINCT p.id) AS totalPedidos,
+                SUM(p.monto_total) AS totalVentas
+            FROM pedidos p
+            JOIN clientes c ON p.cliente_id = c.id
+            GROUP BY c.preferencia_marca
+            ORDER BY totalVentas DESC
+        `);
+
+        res.json({ success: true, data: rows });
+    } catch (error) {
+        console.error("Error en marcas-vendidas:", error);
+        res.status(500).json({ success: false, message: "Error interno" });
+    }
+});
+
+app.get('/api/dashboard/ventas-por-edad', async (req, res) => {
+    const [rows] = await pool.execute(`
+        SELECT 
+            CASE 
+                WHEN TIMESTAMPDIFF(YEAR, c.fecha_nacimiento, CURDATE()) < 18 THEN 'Menores de 18'
+                WHEN TIMESTAMPDIFF(YEAR, c.fecha_nacimiento, CURDATE()) BETWEEN 18 AND 25 THEN '18-25'
+                WHEN TIMESTAMPDIFF(YEAR, c.fecha_nacimiento, CURDATE()) BETWEEN 26 AND 35 THEN '26-35'
+                WHEN TIMESTAMPDIFF(YEAR, c.fecha_nacimiento, CURDATE()) BETWEEN 36 AND 50 THEN '36-50'
+                ELSE 'Más de 50'
+            END AS rangoEdad,
+            COUNT(DISTINCT p.id) AS totalPedidos,
+            SUM(p.monto_total) AS ventasTotales
+        FROM pedidos p
+        JOIN clientes c ON p.cliente_id = c.id
+        GROUP BY rangoEdad
+        ORDER BY ventasTotales DESC
+    `);
+    res.json({ success: true, data: rows });
+});
+
 //Ruta para traer los pedidos por el ID del cliente
 app.get('/api/pedidos/:id', requireAuth, async (req, res) => {
     const pedidoId = req.params.id;
@@ -761,6 +1049,7 @@ if (!req.session.userId) {
 });
 
 //CREAR ORDEN
+// CREAR ORDEN CON VALIDACIÓN DE STOCK
 app.post('/api/paypal/create-order', requireAuth, async (req, res) => {
     const clienteId = req.session.userId;
     const { items } = req.body;
@@ -769,6 +1058,44 @@ app.post('/api/paypal/create-order', requireAuth, async (req, res) => {
         return res.status(400).json({ success: false, message: 'El carrito está vacío.' });
     }
 
+    // ✅ Validar que haya stock suficiente antes de crear la orden
+    try {
+        for (const item of items) {
+            if (!item.size || !item.quantity) {
+                return res.status(400).json({
+                    success: false,
+                    message: `Faltan datos para ${item.name || 'producto sin nombre'}`
+                });
+            }
+
+            const [stockCheck] = await pool.execute(`
+                SELECT pt.stock
+                FROM producto_tallas pt
+                JOIN productos p ON p.id = pt.producto_id
+                JOIN tallas t ON t.id = pt.talla_id
+                WHERE p.codigo = ? AND t.talla = ?
+            `, [item.id.split('_')[0], item.size]);
+
+            if (stockCheck.length === 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: `Talla no encontrada para ${item.name} (${item.size})`
+                });
+            }
+
+            if (stockCheck[0].stock < item.quantity) {
+                return res.status(400).json({
+                    success: false,
+                    message: `No hay suficiente stock para ${item.name} talla ${item.size}. Disponible: ${stockCheck[0].stock}`
+                });
+            }
+        }
+    } catch (error) {
+        console.error('❌ Error validando stock:', error);
+        return res.status(500).json({ success: false, message: 'Error al validar inventario.' });
+    }
+
+    // ✅ Si todo está bien, calcular total y crear orden en PayPal
     const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
     const request = new paypal.orders.OrdersCreateRequest();
@@ -792,7 +1119,23 @@ app.post('/api/paypal/create-order', requireAuth, async (req, res) => {
     }
 });
 
+// Actualizar nivel_stock en productos con la suma total de tallas
+async function actualizarNivelStock(connection, productoId) {
+    await connection.execute(
+        `UPDATE productos
+         SET nivel_stock = (
+             SELECT COALESCE(SUM(stock), 0)
+             FROM producto_tallas
+             WHERE producto_id = ? AND activo = 1
+         ),
+         actualizado_en = NOW()
+         WHERE id = ?`,
+        [productoId, productoId]
+    );
+}
+
 // Crear pedido en BD después del pago
+// CREAR PEDIDO EN BD Y DESCONTAR STOCK TRAS PAGO EXITOSO
 app.post('/api/crear-pedido', requireAuth, async (req, res) => {
     const clienteId = req.session.userId;
     const { items, montoTotal } = req.body;
@@ -814,7 +1157,7 @@ app.post('/api/crear-pedido', requireAuth, async (req, res) => {
 
         const pedidoId = pedidoResult.insertId;
 
-        // 2. Crear items del pedido
+        // 2. Crear items del pedido y descontar stock
         for (const item of items) {
             if (!item.size || !item.price || !item.id) {
                 throw new Error('Faltan datos en el item');
@@ -832,14 +1175,22 @@ app.post('/api/crear-pedido', requireAuth, async (req, res) => {
 
             const productoId = producto[0].id;
 
+            // ✅ Insertar item del pedido
             await connection.execute(
                 `INSERT INTO items_pedido (pedido_id, producto_id, cantidad, talla, precio_compra, creado_en, actualizado_en)
                 VALUES (?, ?, ?, ?, ?, NOW(), NOW())`,
                 [pedidoId, productoId, item.quantity, item.size, item.price]
             );
+
+            // ✅ Descontar stock real en producto_tallas
+            await descontarStock(connection, productoId, item.size, item.quantity);
+            // ✅ Actualizar nivel_stock general del producto
+            await actualizarNivelStock(connection, productoId);
         }
 
+        // ✅ Confirmar toda la transacción
         await connection.commit();
+
         res.json({ success: true, pedidoId });
 
     } catch (error) {
@@ -850,6 +1201,20 @@ app.post('/api/crear-pedido', requireAuth, async (req, res) => {
         connection.release();
     }
 });
+
+// Descontar stock tras compra
+async function descontarStock(connection, productoId, talla, cantidad) {
+    const [result] = await connection.execute(
+        `UPDATE producto_tallas
+         SET stock = stock - ?
+         WHERE producto_id = ? AND talla_id = (SELECT id FROM tallas WHERE talla = ?)`,
+        [cantidad, productoId, talla]
+    );
+
+    if (result.affectedRows === 0) {
+        throw new Error(`No se pudo descontar stock para producto ${productoId} talla ${talla}`);
+    }
+}
 
 // CAPTURA DE ORDEN
 app.post('/api/paypal/capture-order', requireAuth, async (req, res) => {

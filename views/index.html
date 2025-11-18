@@ -397,141 +397,142 @@
     </section>
 
         <!-- Sección de Contacto -->
-<section id="contacto" class="contact-section">
-  <div class="contact-container">
-    <h2 class="section-title">¿Tienes Preguntas?</h2>
-    <p>Envíanos un mensaje y nuestro equipo se pondrá en contacto contigo.</p>
+    <section id="contacto" class="contact-section">
+    <div class="contact-container">
+        <h2 class="section-title">¿Tienes Preguntas?</h2>
+        <p>Envíanos un mensaje y nuestro equipo se pondrá en contacto contigo.</p>
 
-    <!-- Formulario que se muestra solo si hay sesión -->
-    <form id="contact-form" class="contact-form hidden" novalidate>
-      <div class="form-group">
-        <input type="text" id="nombre" name="nombre" required>
-        <label for="nombre">Nombre Completo</label>
-      </div>
+        <!-- Formulario que se muestra solo si hay sesión -->
+        <form id="contact-form" class="contact-form hidden" novalidate>
+        <div class="form-group">
+            <input type="text" id="nombre" name="nombre" required>
+            <label for="nombre">Nombre Completo</label>
+        </div>
 
-      <!-- Este div se oculta si hay sesión -->
-      <div class="form-group email-group">
-        <input type="email" id="email" name="email" required>
-        <label for="email">Correo Electrónico</label>
-      </div>
+        <!-- Este div se oculta si hay sesión -->
+        <div class="form-group email-group">
+            <input type="email" id="email" name="email" required>
+            <label for="email">Correo Electrónico</label>
+        </div>
 
-      <div class="form-group">
-        <textarea id="mensaje" name="mensaje" rows="4" required></textarea>
-        <label for="mensaje">Tu Mensaje</label>
-      </div>
-      <button type="submit" class="cta-button form-submit-btn">Enviar Mensaje</button>
-    </form>
+        <div class="form-group">
+            <textarea id="mensaje" name="mensaje" rows="4" required></textarea>
+            <label for="mensaje">Tu Mensaje</label>
+        </div>
+        <button type="submit" class="cta-button form-submit-btn">Enviar Mensaje</button>
+        </form>
 
 
-    <div id="form-response" class="form-response"></div>
-  </div>
-</section>
+        <div id="form-response" class="form-response"></div>
+    </div>
+    </section>
 
         <!-- Sección de como pagar con paypal -->
 
-<section id="paypal-tutorial" class="paypal-tutorial-section">
-  <div class="container">
+    <section id="paypal-tutorial" class="paypal-tutorial-section">
+    <div class="container">
 
-    <!-- Título principal con animación -->
-    <h2 class="section-title fade-in">Paga en segundos con <span class="paypal-logo"><i class="fab fa-paypal"></i> PayPal</span></h2>
-    <p class="section-subtitle fade-in">Tutorial rápido para crear tu cuenta o acceder sin complicaciones.</p>
+        <!-- Título principal con animación -->
+        <h2 class="section-title fade-in">Paga en segundos con <span class="paypal-logo"><i class="fab fa-paypal"></i> PayPal</span></h2>
+        <p class="section-subtitle fade-in">Tutorial rápido para crear tu cuenta o acceder sin complicaciones.</p>
 
-    <!-- Pasos -->
-    <div class="tutorial-wrapper">
+        <!-- Pasos -->
+        <div class="tutorial-wrapper">
 
-      <!-- Paso 1 -->
-<article class="tutorial-card slide-up" onclick="window.location.href='https://www.paypal.com/us/webapps/mpp/account-selection';" style="cursor: pointer;">
-    <figure class="card-media">
-        <img src="/images/paypal.png" alt="Paso 1: Entra a paypal" class="step-icon">
-    </figure>
-    <div class="card-content">
-        <span class="card-number">1</span>
-        <h3>Entra a PayPal</h3>
-        <p>Abre <strong>paypal.com</strong> o descarga la app gratuita en tu móvil.</p>
+        <!-- Paso 1 -->
+    <article class="tutorial-card slide-up" onclick="window.location.href='https://www.paypal.com/us/webapps/mpp/account-selection';" style="cursor: pointer;">
+        <figure class="card-media">
+            <img src="/images/paypal.png" alt="Paso 1: Entra a paypal" class="step-icon">
+        </figure>
+        <div class="card-content">
+            <span class="card-number">1</span>
+            <h3>Entra a PayPal</h3>
+            <p>Abre <strong>paypal.com</strong> o descarga la app gratuita en tu móvil.</p>
+        </div>
+    </article>
+
+        <!-- Paso 2 -->
+        <article class="tutorial-card slide-up">
+            <figure class="card-media">
+            <img src="/images/agregar-usuario.gif" alt="Paso 2: Crear cuenta" class="step-icon">
+            </figure>
+            <div class="card-content">
+            <span class="card-number">2</span>
+            <h3>Crea tu cuenta</h3>
+            <p>Toca <em>“Regístrate”</em>, elige <em>“Personal”</em> y llena el formulario. ¡Listo en 1 min!</p>
+            </div>
+        </article>
+
+        <!-- Paso 3 -->
+        <article class="tutorial-card slide-up">
+            <figure class="card-media">
+            <img src="/images/correo.gif" alt="Paso 3: Verificar correo" class="step-icon">
+            </figure>
+            <div class="card-content">
+            <span class="card-number">3</span>
+            <h3>Verifica tu correo</h3>
+            <p>Abre el mensaje de PayPal y haz clic en el enlace. Así confirmamos que eres tú.</p>
+            </div>
+        </article>
+
+        <!-- Paso 4 -->
+        <article class="tutorial-card slide-up">
+            <figure class="card-media">
+            <img src="/images/acceso.gif" alt="Paso 4: Iniciar sesión" class="step-icon">
+            </figure>
+            <div class="card-content">
+            <span class="card-number">4</span>
+            <h3>Inicia sesión</h3>
+            <p>Ya con tu cuenta, entra con tu correo + contraseña. ¡A comprar sin compartir tu tarjeta!</p>
+            </div>
+        </article>
+
+        </div><!-- /tutorial-wrapper -->
+
+        <!-- CTA final -->
+        <div class="tutorial-footer fade-in">
+        <p>¿Listo para finalizar tu pedido?</p>
+        <a href="#originales" class="cta-button">Ver productos</a>
+        </div>
+
     </div>
-</article>
-
-      <!-- Paso 2 -->
-      <article class="tutorial-card slide-up">
-        <figure class="card-media">
-          <img src="/images/agregar-usuario.gif" alt="Paso 2: Crear cuenta" class="step-icon">
-        </figure>
-        <div class="card-content">
-          <span class="card-number">2</span>
-          <h3>Crea tu cuenta</h3>
-          <p>Toca <em>“Regístrate”</em>, elige <em>“Personal”</em> y llena el formulario. ¡Listo en 1 min!</p>
-        </div>
-      </article>
-
-      <!-- Paso 3 -->
-      <article class="tutorial-card slide-up">
-        <figure class="card-media">
-          <img src="/images/correo.gif" alt="Paso 3: Verificar correo" class="step-icon">
-        </figure>
-        <div class="card-content">
-          <span class="card-number">3</span>
-          <h3>Verifica tu correo</h3>
-          <p>Abre el mensaje de PayPal y haz clic en el enlace. Así confirmamos que eres tú.</p>
-        </div>
-      </article>
-
-      <!-- Paso 4 -->
-      <article class="tutorial-card slide-up">
-        <figure class="card-media">
-          <img src="/images/acceso.gif" alt="Paso 4: Iniciar sesión" class="step-icon">
-        </figure>
-        <div class="card-content">
-          <span class="card-number">4</span>
-          <h3>Inicia sesión</h3>
-          <p>Ya con tu cuenta, entra con tu correo + contraseña. ¡A comprar sin compartir tu tarjeta!</p>
-        </div>
-      </article>
-
-    </div><!-- /tutorial-wrapper -->
-
-    <!-- CTA final -->
-    <div class="tutorial-footer fade-in">
-      <p>¿Listo para finalizar tu pedido?</p>
-      <a href="#originales" class="cta-button">Ver productos</a>
-    </div>
-
-  </div>
-</section>
+    </section>
 
 
 
     <!-- Seccion de carrito  -->
-<div id="cartOverlay" class="cart-overlay">
-    <div class="cart-sidebar">
-        <div class="cart-header">
-            <h2>Carrito de Compras</h2>
-            <button class="cart-close" id="cartClose">
-                ✕
-            </button>
-        </div>
-        <div class="cart-content">
-            <div class="cart-items" id="cartItems">
-                <!-- Los productos se agregarán dinámicamente aquí -->
+    <div id="cartOverlay" class="cart-overlay">
+        <div class="cart-sidebar">
+            <div class="cart-header">
+                <h2>Carrito de Compras</h2>
+                <button class="cart-close" id="cartClose">
+                    ✕
+                </button>
             </div>
-            <div class="cart-empty" id="cartEmpty">
-                <p>Tu carrito está vacío</p>
-                <p>¡Agrega algunos productos increíbles!</p>
+            <div class="cart-content">
+                <div class="cart-items" id="cartItems">
+                    <!-- Los productos se agregarán dinámicamente aquí -->
+                </div>
+                <div class="cart-empty" id="cartEmpty">
+                    <p>Tu carrito está vacío</p>
+                    <p>¡Agrega algunos productos increíbles!</p>
+                </div>
             </div>
-        </div>
-        <div class="cart-footer">
-            <div class="cart-total">
-                <span class="total-label">Total:</span>
-                <span class="total-amount" id="cartTotal">$0.00 MXN</span>
-            </div>
-            <div class="cart-actions">
-                <button class="clear-cart-btn" id="clearCart">Vaciar Carrito</button>
-                <div id="paypal-button-container" style="display: none;"></div>
-                    <!-- Botón de PayPal se renderizará aquí -->
-                
+            <div class="cart-footer">
+                <div class="volume-discount-info" id="volumeInfo" style="font-size:13px;color:#555;margin:6px 0;"></div>
+                <div class="cart-total">
+                    <span class="total-label">Total:</span>
+                    <span class="total-amount" id="cartTotal">$0.00 MXN</span>
+                </div>
+                <div class="cart-actions">
+                    <button class="clear-cart-btn" id="clearCart">Vaciar Carrito</button>
+                    <div id="paypal-button-container" style="display: none;"></div>
+                        <!-- Botón de PayPal se renderizará aquí -->
+                    
+                </div>
             </div>
         </div>
     </div>
-</div>
 
     <!-- Alerta acceso denegado -->
     <div id="premiumAlert" class="premium-alert">
@@ -567,128 +568,128 @@
     </div>
 
     <!-- Contenido -->
-<div class="auth-body-premium">
-  <!-- ==========  L O G I N  ========== -->
-  <form class="auth-form-premium active" id="loginForm">
-    <div class="form-row">
-      <div class="input-group">
-        <i class="fas fa-envelope input-icon"></i>
-        <input type="email" id="login-email" placeholder="Correo electrónico" required>
-      </div>
+    <div class="auth-body-premium">
+    <!-- ==========  L O G I N  ========== -->
+    <form class="auth-form-premium active" id="loginForm">
+        <div class="form-row">
+        <div class="input-group">
+            <i class="fas fa-envelope input-icon"></i>
+            <input type="email" id="login-email" placeholder="Correo electrónico" required>
+        </div>
+        </div>
+        <div class="form-row">
+        <div class="input-group">
+            <i class="fas fa-lock input-icon"></i>
+            <input type="password" id="login-password" placeholder="Contraseña" required>
+        </div>
+        </div>
+        <div class="form-options">
+            <label><input type="checkbox" id="remember"> Recordarme</label>
+            <a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a>
+        </div>
+        <button type="submit" class="auth-submit-btn">Iniciar Sesión</button>
+    </form>
+
+    <!-- ==========  R E G I S T E R  ========== -->
+    <form class="auth-form-premium" id="registerForm">
+        <div class="form-grid">
+        <!-- Nombre -->
+        <div class="input-group">
+            <i class="fas fa-user input-icon"></i>
+            <input type="text" id="register-name" placeholder="Nombre completo" required>
+        </div>
+
+        <!-- Email -->
+        <div class="input-group">
+            <i class="fas fa-envelope input-icon"></i>
+            <input type="email" id="register-email" placeholder="Correo electrónico" required>
+        </div>
+
+        <!-- Contraseña -->
+        <div class="input-group">
+            <i class="fas fa-lock input-icon"></i>
+            <input type="password" id="register-password" placeholder="Contraseña" required>
+        </div>
+
+        <!-- Confirmar contraseña -->
+        <div class="input-group">
+            <i class="fas fa-lock input-icon"></i>
+            <input type="password" id="register-confirm" placeholder="Confirmar contraseña" required>
+        </div>
+
+        <!-- Teléfono -->
+        <div class="input-group">
+            <i class="fas fa-phone input-icon"></i>
+            <input type="text" id="register-telefono" placeholder="Teléfono o celular">
+        </div>
+
+        <!-- Dirección -->
+        <div class="input-group">
+            <i class="fas fa-map-marker-alt input-icon"></i>
+            <input type="text" id="register-direccion" placeholder="Dirección" required>
+        </div>
+
+        <!-- Colonia -->
+        <div class="input-group">
+            <i class="fas fa-building input-icon"></i>
+            <input type="text" id="register-colonia" placeholder="Colonia" required>
+        </div>
+
+        <!-- Código Postal -->
+        <div class="input-group">
+            <i class="fas fa-mail-bulk input-icon"></i>
+            <input type="text" id="register-codigo-postal" placeholder="Código Postal" required>
+        </div>
+
+        <!-- Ciudad (select) -->
+        <select id="register-ciudad" required>
+            <option value="">Ciudad...</option>
+            <option>Ciudad de México</option><option>Guadalajara</option><option>Monterrey</option>
+            <option>Puebla</option><option>León</option><option>Toluca</option>
+            <option>Ciudad Juárez</option><option>Tijuana</option><option>Mérida</option>
+            <option>San Luis Potosí</option><option>Aguascalientes</option><option>Cuernavaca</option>
+            <option>Cancún</option><option>Querétaro</option><option>Morelia</option>
+            <option>Hermosillo</option><option>Chihuahua</option><option>Culiacán</option>
+            <option>Tampico</option><option>Veracruz</option>
+        </select>
+
+        <!-- Punto de entrega (select) -->
+        <select id="register-punto-entrega" required>
+            <option value="">Punto de entrega...</option>
+            <option>Jardin Hidalgo BA Cuautepec</option>
+            <option>Quiosco de Barri bajo Cuautepec</option>
+            <option>Gasolineria la pastora</option>
+            <option>Walmart Tenayuca</option>
+        </select>
+
+        <!-- Fecha nacimiento (date) -->
+        <input type="date" id="register-fecha-nacimiento" required>
+
+        <!-- Género (select) -->
+        <select id="register-genero" required>
+            <option value="">Género...</option>
+            <option value="M">Masculino</option>
+            <option value="F">Femenino</option>
+            <option value="Otro">Otro</option>
+            <option value="Prefiero no decir">Prefiero no decir</option>
+        </select>
+
+        <!-- Marca favorita -->
+        <div class="input-group">
+            <i class="fas fa-star input-icon"></i>
+            <input type="text" id="register-preferencia-marca" placeholder="Marca favorita (Ej: Nike, Adidas...)">
+        </div>
+        </div>
+
+        <button type="submit" class="auth-submit-btn">Crear Cuenta</button>
+    </form>
     </div>
-    <div class="form-row">
-      <div class="input-group">
-        <i class="fas fa-lock input-icon"></i>
-        <input type="password" id="login-password" placeholder="Contraseña" required>
-      </div>
+
+    <div class="auth-footer-premium">
+    <p id="authFooterText">
+        ¿No tienes cuenta? <a href="#" class="switch-tab-premium" data-tab="register">Regístrate aquí</a>
+    </p>
     </div>
-    <div class="form-options">
-        <label><input type="checkbox" id="remember"> Recordarme</label>
-        <a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a>
-    </div>
-    <button type="submit" class="auth-submit-btn">Iniciar Sesión</button>
-  </form>
-
-  <!-- ==========  R E G I S T E R  ========== -->
-  <form class="auth-form-premium" id="registerForm">
-    <div class="form-grid">
-      <!-- Nombre -->
-      <div class="input-group">
-        <i class="fas fa-user input-icon"></i>
-        <input type="text" id="register-name" placeholder="Nombre completo" required>
-      </div>
-
-      <!-- Email -->
-      <div class="input-group">
-        <i class="fas fa-envelope input-icon"></i>
-        <input type="email" id="register-email" placeholder="Correo electrónico" required>
-      </div>
-
-      <!-- Contraseña -->
-      <div class="input-group">
-        <i class="fas fa-lock input-icon"></i>
-        <input type="password" id="register-password" placeholder="Contraseña" required>
-      </div>
-
-      <!-- Confirmar contraseña -->
-      <div class="input-group">
-        <i class="fas fa-lock input-icon"></i>
-        <input type="password" id="register-confirm" placeholder="Confirmar contraseña" required>
-      </div>
-
-      <!-- Teléfono -->
-      <div class="input-group">
-        <i class="fas fa-phone input-icon"></i>
-        <input type="text" id="register-telefono" placeholder="Teléfono o celular">
-      </div>
-
-      <!-- Dirección -->
-      <div class="input-group">
-        <i class="fas fa-map-marker-alt input-icon"></i>
-        <input type="text" id="register-direccion" placeholder="Dirección" required>
-      </div>
-
-      <!-- Colonia -->
-      <div class="input-group">
-        <i class="fas fa-building input-icon"></i>
-        <input type="text" id="register-colonia" placeholder="Colonia" required>
-      </div>
-
-      <!-- Código Postal -->
-      <div class="input-group">
-        <i class="fas fa-mail-bulk input-icon"></i>
-        <input type="text" id="register-codigo-postal" placeholder="Código Postal" required>
-      </div>
-
-      <!-- Ciudad (select) -->
-      <select id="register-ciudad" required>
-        <option value="">Ciudad...</option>
-        <option>Ciudad de México</option><option>Guadalajara</option><option>Monterrey</option>
-        <option>Puebla</option><option>León</option><option>Toluca</option>
-        <option>Ciudad Juárez</option><option>Tijuana</option><option>Mérida</option>
-        <option>San Luis Potosí</option><option>Aguascalientes</option><option>Cuernavaca</option>
-        <option>Cancún</option><option>Querétaro</option><option>Morelia</option>
-        <option>Hermosillo</option><option>Chihuahua</option><option>Culiacán</option>
-        <option>Tampico</option><option>Veracruz</option>
-      </select>
-
-      <!-- Punto de entrega (select) -->
-      <select id="register-punto-entrega" required>
-        <option value="">Punto de entrega...</option>
-        <option>Jardin Hidalgo BA Cuautepec</option>
-        <option>Quiosco de Barri bajo Cuautepec</option>
-        <option>Gasolineria la pastora</option>
-        <option>Walmart Tenayuca</option>
-      </select>
-
-      <!-- Fecha nacimiento (date) -->
-      <input type="date" id="register-fecha-nacimiento" required>
-
-      <!-- Género (select) -->
-      <select id="register-genero" required>
-        <option value="">Género...</option>
-        <option value="M">Masculino</option>
-        <option value="F">Femenino</option>
-        <option value="Otro">Otro</option>
-        <option value="Prefiero no decir">Prefiero no decir</option>
-      </select>
-
-      <!-- Marca favorita -->
-      <div class="input-group">
-        <i class="fas fa-star input-icon"></i>
-        <input type="text" id="register-preferencia-marca" placeholder="Marca favorita (Ej: Nike, Adidas...)">
-      </div>
-    </div>
-
-    <button type="submit" class="auth-submit-btn">Crear Cuenta</button>
-  </form>
-</div>
-
-<div class="auth-footer-premium">
-  <p id="authFooterText">
-    ¿No tienes cuenta? <a href="#" class="switch-tab-premium" data-tab="register">Regístrate aquí</a>
-  </p>
-</div>
 
         <!-- Modal de Recuperación de Contraseña -->
     <div class="auth-modal" id="passwordRecoveryModal">
@@ -720,6 +721,7 @@
             <p id="notification-message">Operación completada correctamente.</p>
         </div>
     </div>
+    
 
     </main>
 
@@ -733,6 +735,36 @@
     <script src="/js/script.js"></script>
     <!-- <script src="/js/auth.js"></script> -->
        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <!-- Modal de Guía de Tallas -->
+<div id="sizeGuideModal" class="modal size-guide-modal">
+    <div class="modal-content size-guide-content">
+        <span class="close" onclick="ProductManager.closeSizeGuideModal()">&times;</span>
+        <h2>Guía de Tallas - Calzado</h2>
+        <p>Encuentra tu talla ideal.</p>
 
+        <table class="size-guide-table">
+            <thead>
+                <tr>
+                    <th>Talla MX</th>
+                    <th>Talla US</th>
+                    <th>CM</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>25</td><td>7</td><td>25</td></tr>
+                <tr><td>25.5</td><td>7.5</td><td>25.5</td></tr>
+                <tr><td>26</td><td>8</td><td>26</td></tr>
+                <tr><td>26.5</td><td>8.5</td><td>26.5</td></tr>
+                <tr><td>27</td><td>9</td><td>27</td></tr>
+                <tr><td>27.5</td><td>9.5</td><td>27.5</td></tr>
+                <tr><td>28</td><td>10</td><td>28</td></tr>
+                <tr><td>28.5</td><td>10.5</td><td>28.5</td></tr>
+                <tr><td>29</td><td>11</td><td>29</td></tr>
+            </tbody>
+        </table>
+
+        <p class="size-guide-tip"><strong>Consejo:</strong> Mide tu pie desde el talón hasta la punta y compáralo con la columna de centímetros.</p>
+    </div>
+</div>
 </body>
 </html>
