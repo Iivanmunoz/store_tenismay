@@ -432,6 +432,7 @@ const CartManager = {
             }
         );
     },
+    
     // ====== DESCUENTOS POR VOLUMEN ======
     _getVolumePrice(unitPrice, qtyInCart) {
         if (qtyInCart >= 10) return 600.00;
@@ -525,6 +526,27 @@ const AuthManager = {
         this.cacheElements();
         this.bindEvents();
         this.loadUserFromStorage();
+        // Verificar si la sesión sigue viva
+        fetch('/api/auth/check', { credentials: 'include' })
+        .then(r => r.json())
+        .then(data => {
+            if (!data.authenticated) {
+            // Sesión muerta → limpiar todo
+            localStorage.removeItem(CONFIG.USER_STORAGE_KEY);
+            localStorage.removeItem(CONFIG.CART_STORAGE_KEY);
+            currentUser = null;
+            cart = [];
+            CartManager.updateDisplay(); // refresca UI
+            }
+        })
+        .catch(() => {
+            // error de red → también limpiamos
+            localStorage.removeItem(CONFIG.USER_STORAGE_KEY);
+            localStorage.removeItem(CONFIG.CART_STORAGE_KEY);
+            currentUser = null;
+            cart = [];
+            CartManager.updateDisplay();
+        });
     },
 
     cacheElements() {
@@ -1112,6 +1134,40 @@ container.addEventListener('touchmove', (e) => {
 const ProductManager = {
     init() {
         this.loadProducts();
+        this.bindSizeGuideEvents();
+
+    },
+        // Agregar estas funciones al ProductManager
+    bindSizeGuideEvents() {
+        // Asegurarse de que el modal esté oculto al inicio
+        const sizeGuideModal = document.getElementById('sizeGuideModal');
+        if (sizeGuideModal) {
+            sizeGuideModal.style.display = 'none';
+        }
+    },
+
+    openSizeGuideModal() {
+        const modal = document.getElementById('sizeGuideModal');
+        if (modal) {
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // Prevenir scroll del body
+        }
+    },
+
+    closeSizeGuideModal() {
+        const modal = document.getElementById('sizeGuideModal');
+        if (modal) {
+            modal.style.display = 'none';
+            document.body.style.overflow = ''; // Restaurar scroll
+        }
+    },
+
+    // Cerrar modal al hacer clic fuera
+    handleModalClick(event) {
+        const modal = document.getElementById('sizeGuideModal');
+        if (event.target === modal) {
+            this.closeSizeGuideModal();
+        }0
     },
 
     async loadProducts() {
@@ -1223,12 +1279,11 @@ const ProductManager = {
                     ${!hasStock ? 'Sin Stock' : 'Selecciona una talla'}
                 </button>
             </div>
-            <div class="delivery-info">
-                <span class="delivery-icon">🚚</span>
-                <div class="delivery-text">
-                    <span>Entregas: Miercoles y Sabado</span>
-                </div>
-            </div>
+
+            <button type="button" class="size-guide-btn" onclick="ProductManager.openSizeGuideModal()">
+                📏 Medida de tallas
+            </button>
+
         `;
 
         this.bindProductEventsWithStock(productDiv, product);
@@ -1331,6 +1386,7 @@ const ProductManager = {
             }
         });
     }
+    
 };
 
 // ========== GESTIÓN DE NAVEGACIÓN MÓVIL ==========
@@ -1690,6 +1746,13 @@ document.addEventListener('DOMContentLoaded', () => {
         FormManager.init();
         ProductManager.init();
         PerformanceOptimizer.init();
+                // Agregar evento para cerrar modal al hacer clic fuera
+        const sizeGuideModal = document.getElementById('sizeGuideModal');
+        if (sizeGuideModal) {
+            sizeGuideModal.addEventListener('click', (e) => {
+                ProductManager.handleModalClick(e);
+            });
+        }
         
         console.log('✅');
         

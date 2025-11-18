@@ -4,7 +4,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const sendPasswordResetEmail = async (email, resetUrl) => {
   try {
     await resend.emails.send({
-      from: 'TennisMay <hola@hermanostenis.com>',
+      from: 'TennisMay <tickets_orden@hermanostenis.com>',
       to: email,
       subject: 'Recuperación de Contraseña',
       html: `
