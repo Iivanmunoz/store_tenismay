@@ -31,26 +31,26 @@ const PORT = process.env.PORT || 3000;
 // -----------------------------------------------------------------------------
 // | Configuración de la Base de Datos MySQL                                   |
 // -----------------------------------------------------------------------------
-// const dbConfig = {
-//     host: 'mysql.railway.internal',
-//     user: 'root',
-//     password: 'KxvPCoTBQFFOBLACyubsEHxDIfTVqKPk',
-//     database: 'railway',
-//     port: process.env.DB_PORT || 3306,
-//     waitForConnections: true,
-//     connectionLimit: 10,
-//     queueLimit: 0
-// };
 const dbConfig = {
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD, // Variable de entorno
-    database: process.env.DB_NAME || 'mi_bd',
+    host: 'mysql.railway.internal',
+    user: 'root',
+    password: 'KxvPCoTBQFFOBLACyubsEHxDIfTVqKPk',
+    database: 'railway',
     port: process.env.DB_PORT || 3306,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
 };
+// const dbConfig = {
+//     host: process.env.DB_HOST || 'localhost',
+//     user: process.env.DB_USER || 'root',
+//     password: process.env.DB_PASSWORD, // Variable de entorno
+//     database: process.env.DB_NAME || 'mi_bd',
+//     port: process.env.DB_PORT || 3306,
+//     waitForConnections: true,
+//     connectionLimit: 10,
+//     queueLimit: 0
+// };
 
 const pool = mysql.createPool(dbConfig);
 
@@ -1134,7 +1134,6 @@ async function actualizarNivelStock(connection, productoId) {
     );
 }
 
-// Crear pedido en BD después del pago
 // CREAR PEDIDO EN BD Y DESCONTAR STOCK TRAS PAGO EXITOSO
 app.post('/api/crear-pedido', requireAuth, async (req, res) => {
     const clienteId = req.session.userId;
