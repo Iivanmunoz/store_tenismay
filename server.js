@@ -31,32 +31,32 @@ const PORT = process.env.PORT || 3000;
 // -----------------------------------------------------------------------------
 // | Configuración de la Base de Datos MySQL                                   |
 // -----------------------------------------------------------------------------
-const dbConfig = {
-    host: 'mysql.railway.internal',
-    user: 'root',
-    password: 'KxvPCoTBQFFOBLACyubsEHxDIfTVqKPk',
-    database: 'railway',
-    port: process.env.DB_PORT || 3306,
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
-};
 // const dbConfig = {
-//     host: process.env.DB_HOST || 'localhost',
-//     user: process.env.DB_USER || 'root',
-//     password: process.env.DB_PASSWORD, // Variable de entorno
-//     database: process.env.DB_NAME || 'mi_bd',
+//     host: 'mysql.railway.internal',
+//     user: 'root',
+//     password: 'KxvPCoTBQFFOBLACyubsEHxDIfTVqKPk',
+//     database: 'railway',
 //     port: process.env.DB_PORT || 3306,
 //     waitForConnections: true,
 //     connectionLimit: 10,
 //     queueLimit: 0
 // };
+const dbConfig = {
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD, // Variable de entorno
+    database: process.env.DB_NAME || 'mi_bd',
+    port: process.env.DB_PORT || 3306,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+};
 
 const pool = mysql.createPool(dbConfig);
 
 // Configurar almacén de sesiones en MySQL
 const sessionStore = new MySQLStore({
-    expiration: 24 * 60 * 60 * 1000, // 24 horas
+    expiration: 12 * 60 * 60 * 1000, // 12 horas
     createDatabaseTable: true,
     schema: {
         tableName: 'sessions',
@@ -91,11 +91,9 @@ async function testConnection() {
     function paypalClient() {
         return new paypal.core.PayPalHttpClient(environment());
     }
-   
 
-
-testConnection();
-paypalClient();
+    testConnection();
+    paypalClient();
 
 // -----------------------------------------------------------------------------
 // | Configuración de Middlewares                                              |
@@ -1033,7 +1031,7 @@ app.get('/reset_password.html', (req, res) => {
 });
 
 // -----------------------------------------------------------------------------
-// |  PayPal Configuracion                                                  |
+// |  rutas para PayPal Configuracion                                          |
 // -----------------------------------------------------------------------------
 
 // CONEXION CON PAYPAL
@@ -1048,7 +1046,6 @@ if (!req.session.userId) {
     });
 });
 
-//CREAR ORDEN
 // CREAR ORDEN CON VALIDACIÓN DE STOCK
 app.post('/api/paypal/create-order', requireAuth, async (req, res) => {
     const clienteId = req.session.userId;
