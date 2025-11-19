@@ -3534,3 +3534,170 @@ body {
         padding: 10px 6px;
     }
 }
+/* ===== CONTACTANOS - PREMIUM ===== */
+.contactanos-section {
+    padding: 80px 20px;
+    background: linear-gradient(160deg, #f8f9fa 0%, #eef2f6 100%);
+    overflow: hidden;
+}
+
+.contactanos-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.contactanos-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.contactanos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 30px;
+    margin-bottom: 60px;
+}
+
+.contact-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.contact-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+}
+
+.contact-icon {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    color: var(--accent-color);
+}
+
+.contact-card h3 {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    color: var(--primary-color);
+    margin-bottom: 8px;
+}
+
+.contact-card p {
+    font-size: 0.95rem;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.contact-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border-radius: 50px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.whatsapp-btn {
+    background: #25d366;
+    color: white;
+}
+
+.whatsapp-btn:hover {
+    background: #128c7e;
+    transform: scale(1.05);
+}
+
+.email-btn {
+    background: var(--accent-color);
+    color: white;
+}
+
+.email-btn:hover {
+    background: #b8934f;
+    transform: scale(1.05);
+}
+
+.phone-btn {
+    background: var(--primary-color);
+    color: white;
+}
+
+.phone-btn:hover {
+    background: #0a1f3a;
+    transform: scale(1.05);
+}
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.social-links a {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--light-gray-bg);
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.social-links a:hover {
+    background: var(--accent-color);
+    color: white;
+    transform: scale(1.1);
+}
+
+/* Dirección y mapa */
+.contactanos-direccion {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.direccion-info h3 {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+.direccion-info p {
+    font-size: 1rem;
+    color: #555;
+    margin: 4px 0;
+}
+
+.direccion-mapa iframe {
+    border-radius: 12px;
+    width: 100%;
+    height: 200px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .contactanos-direccion {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .contactanos-grid {
+        grid-template-columns: 1fr;
+    }
+}
