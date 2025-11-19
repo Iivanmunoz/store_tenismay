@@ -36,7 +36,7 @@
                 <ul class="nav-links">
                     <li><a href="#originales">Originales</a></li>
                     <li><a href="#falsificaciones">Top Quality</a></li>
-                    <li><a href="#contactanos">Contacto</a></li>
+                    <li><a href="#contacto">Contacto</a></li>
                     <li><a href="#reseñas">Reseñas</a></li>
                     <li><a href="#paypal-tutorial">Pagar en PayPal</a></li>
                 </ul>
@@ -397,101 +397,35 @@
     </section>
 
         <!-- Sección de Contacto -->
-    <section id="contactanos" class="contactanos-section">
-        <div class="contactanos-container">
-            
-            <div class="contactanos-header">
-                <h2 class="section-title">Contáctanos</h2>
-                <p class="section-subtitle">Estamos aquí para ayudarte. Escríbenos por tu canal preferido.</p>
-            </div>
+    <section id="contacto" class="contact-section">
+    <div class="contact-container">
+        <h2 class="section-title">¿Tienes Preguntas?</h2>
+        <p>Envíanos un mensaje y nuestro equipo se pondrá en contacto contigo.</p>
 
-            <div class="contactanos-grid">
-
-                <!-- WhatsApp -->
-                <div class="contact-card whatsapp-card">
-                    <div class="contact-icon">
-                        <i class="fab fa-whatsapp"></i>
-                    </div>
-                    <h3>WhatsApp</h3>
-                    <p>Respuesta inmediata</p>
-                    <a href="https://wa.me/5211234567890?text=Hola%20Tenis%20Mafia%2C%20quiero%20más%20info" 
-                    target="_blank" 
-                    class="contact-btn whatsapp-btn">
-                        <i class="fab fa-whatsapp"></i> Chatear ahora
-                    </a>
-                </div>
-
-                <!-- Correo -->
-                <div class="contact-card email-card">
-                    <div class="contact-icon">
-                        <i class="fas fa-envelope"></i>
-                    </div>
-                    <h3>Correo</h3>
-                    <p>ventas@tenismafia.com</p>
-                    <a href="mailto:ventas@tenismafia.com?subject=Consulta%20de%20productos" 
-                    class="contact-btn email-btn">
-                        <i class="fas fa-paper-plane"></i> Enviar correo
-                    </a>
-                </div>
-
-                <!-- Teléfono -->
-                <div class="contact-card phone-card">
-                    <div class="contact-icon">
-                        <i class="fas fa-phone-alt"></i>
-                    </div>
-                    <h3>Teléfono</h3>
-                    <p>+52 1 123 456 7890</p>
-                    <a href="tel:+5211234567890" 
-                    class="contact-btn phone-btn">
-                        <i class="fas fa-phone-alt"></i> Llamar ahora
-                    </a>
-                </div>
-
-                <!-- Redes Sociales -->
-                <div class="contact-card social-card">
-                    <div class="contact-icon">
-                        <i class="fas fa-hashtag"></i>
-                    </div>
-                    <h3>Redes Sociales</h3>
-                    <p>Síguenos para ofertas exclusivas</p>
-                    <div class="social-links">
-                        <a href="https://instagram.com/tenismafia" target="_blank" aria-label="Instagram">
-                            <i class="fab fa-instagram"></i>
-                        </a>
-                        <a href="https://facebook.com/tenismafia" target="_blank" aria-label="Facebook">
-                            <i class="fab fa-facebook-f"></i>
-                        </a>
-                        <a href="https://tiktok.com/@tenismafia" target="_blank" aria-label="TikTok">
-                            <i class="fab fa-tiktok"></i>
-                        </a>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- Mapa o dirección -->
-            <div class="contactanos-direccion">
-                <div class="direccion-info">
-                    <h3>Ubicación</h3>
-                    <p><strong>Tenis Mafia</strong></p>
-                    <p>Col. Cuautepec, CDMX</p>
-                    <p>México</p>
-                </div>
-                <div class="direccion-mapa">
-                    <iframe 
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3762.5883026420636!2d-99.13851368437967!3d19.401698347320!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTnCsDI0JzA2LjEiTiA5OcKwMDgnMTguOSJX!5e0!3m2!1ses!2smx!4v1234567890"
-                        width="100%"
-                        height="200"
-                        style="border:0; border-radius: 12px;"
-                        allowfullscreen=""
-                        loading="lazy">
-                    </iframe>
-                </div>
-            </div>
-
+        <!-- Formulario que se muestra solo si hay sesión -->
+        <form id="contact-form" class="contact-form hidden" novalidate>
+        <div class="form-group">
+            <input type="text" id="nombre" name="nombre" required>
+            <label for="nombre">Nombre Completo</label>
         </div>
-    </section>
 
+        <!-- Este div se oculta si hay sesión -->
+        <div class="form-group email-group">
+            <input type="email" id="email" name="email" required>
+            <label for="email">Correo Electrónico</label>
+        </div>
+
+        <div class="form-group">
+            <textarea id="mensaje" name="mensaje" rows="4" required></textarea>
+            <label for="mensaje">Tu Mensaje</label>
+        </div>
+        <button type="submit" class="cta-button form-submit-btn">Enviar Mensaje</button>
+        </form>
+
+
+        <div id="form-response" class="form-response"></div>
+    </div>
+    </section>
 
         <!-- Sección de como pagar con paypal -->
 
@@ -801,7 +735,6 @@
     <script src="/js/script.js"></script>
     <!-- <script src="/js/auth.js"></script> -->
        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-
     <!-- Modal de Guía de Tallas -->
 <div id="sizeGuideModal" class="modal size-guide-modal">
     <div class="modal-content size-guide-content">
